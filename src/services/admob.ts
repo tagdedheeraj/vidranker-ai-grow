@@ -25,7 +25,7 @@ class AdMobService {
       
       await AdMob.initialize({
         testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-        initializeForTesting: true, // Set to false for production
+        initializeForTesting: false, // Set to false for production
       });
 
       this.isInitialized = true;
@@ -55,12 +55,12 @@ class AdMobService {
       }
 
       const bannerOptions: BannerAdOptions = {
-        // Test Banner Ad Unit ID - replace with your actual ad unit ID for production
-        adId: 'ca-app-pub-3940256099942544/6300978111', // Test ID - replace with ca-app-pub-2211398170597117/YOUR_BANNER_AD_UNIT_ID
+        // Your real Banner Ad Unit ID
+        adId: 'ca-app-pub-2211398170597117/2547153500', // Your Banner Ad Unit ID
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: true // Set to false for production
+        isTesting: false // Set to false for production
       };
 
       await AdMob.showBanner(bannerOptions);
@@ -89,10 +89,10 @@ class AdMobService {
         return false;
       }
 
-      // Test Interstitial Ad Unit ID - replace with your actual ad unit ID for production
+      // Your real Interstitial Ad Unit ID
       await AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-3940256099942544/1033173712', // Test ID - replace with ca-app-pub-2211398170597117/YOUR_INTERSTITIAL_AD_UNIT_ID
-        isTesting: true // Set to false for production
+        adId: 'ca-app-pub-2211398170597117/8371175883', // Your Interstitial Ad Unit ID
+        isTesting: false // Set to false for production
       });
 
       await AdMob.showInterstitial();

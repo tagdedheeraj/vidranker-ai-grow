@@ -2,8 +2,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.4915bcda5df44f5d8f4f54a36dbac309',
-  appName: 'VidRanker - SEO Tags & Thumbnails',
+  appId: 'com.vidrankersocilet.com',
+  appName: 'VidRanker',
   webDir: 'dist',
   server: {
     url: 'https://4915bcda-5df4-4f5d-8f4f-54a36dbac309.lovableproject.com?forceHideBadge=true',

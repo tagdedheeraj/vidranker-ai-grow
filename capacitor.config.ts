@@ -21,7 +21,7 @@ const config: CapacitorConfig = {
     },
     AdMob: {
       applicationId: 'ca-app-pub-2211398170597117~9683407494', // Your real App ID
-      initializeForTesting: true, // Set to true for testing to avoid crashes
+      initializeForTesting: true, // Keep true to prevent crashes during testing
       testDeviceIds: ['2077ef9a63d2b398840261c8221a0c9b'],
     },
   },

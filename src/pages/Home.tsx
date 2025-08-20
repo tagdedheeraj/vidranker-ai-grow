@@ -84,8 +84,8 @@ const Home = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">∞</div>
-            <div className="text-sm text-muted-foreground">Free Usage</div>
+            <div className="text-2xl font-bold text-primary">24/7</div>
+            <div className="text-sm text-muted-foreground">Available</div>
           </CardContent>
         </Card>
         <Card>

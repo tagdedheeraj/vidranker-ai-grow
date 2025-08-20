@@ -33,7 +33,7 @@ const Footer = () => {
           </div>
           
           <div className="text-sm text-muted-foreground pt-4 border-t">
-            <p>© 2025 VidRanker. Built with Lovable AI 🚀</p>
+            <p>© 2025 VidRanker. Built with Socilet 🚀</p>
             <p className="flex items-center justify-center gap-1 mt-2">
               Made with <Heart className="w-4 h-4 text-red-500" /> for creators
             </p>

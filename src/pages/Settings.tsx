@@ -2,7 +2,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings2, Info, Heart, Github, Twitter, Star, Zap, Shield } from "lucide-react";
+import { Settings2, Info, Heart, Github, Twitter, Star, Zap, Shield, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { clearAllContent } from "@/utils/localStorage";
 
@@ -81,6 +82,21 @@ const Settings = () => {
             <Badge variant="outline" className="text-green-600 border-green-600">
               Secure
             </Badge>
+          </div>
+          
+          <div className="flex gap-2 pt-4 border-t">
+            <Button asChild variant="outline" size="sm" className="flex-1">
+              <Link to="/privacy">
+                <Shield className="w-4 h-4 mr-2" />
+                Privacy Policy
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm" className="flex-1">
+              <Link to="/terms">
+                <FileText className="w-4 h-4 mr-2" />
+                Terms of Service
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -174,7 +190,7 @@ const Settings = () => {
           
           <div className="text-center text-sm text-muted-foreground pt-4 border-t">
             <p>© 2025 VidRanker. Built with ❤️ for creators</p>
-            <p className="mt-1">Made with Lovable AI 🚀</p>
+            <p className="mt-1">Made with Socilet 🚀</p>
           </div>
         </CardContent>
       </Card>

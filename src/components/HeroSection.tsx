@@ -14,9 +14,11 @@ const HeroSection = () => {
         {/* Logo and title */}
         <div className="mb-8 animate-fade-in">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center glass">
-              <Play className="w-8 h-8 text-white fill-white" />
-            </div>
+            <img 
+              src="/lovable-uploads/c6b11630-2cf2-4348-836e-9ec57f17fd86.png" 
+              alt="VidRanker Logo" 
+              className="w-16 h-16 rounded-2xl"
+            />
             <h1 className="text-5xl md:text-7xl font-bold text-white">
               VidRanker
             </h1>

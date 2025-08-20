@@ -18,13 +18,13 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <img 
-            src="/lovable-uploads/a6a00537-f7df-440b-8202-0d29be1ea43d.png" 
-            alt="Logo" 
+            src="/lovable-uploads/c6b11630-2cf2-4348-836e-9ec57f17fd86.png" 
+            alt="VidRanker Logo" 
             className="w-10 h-10 rounded-lg"
           />
         </Link>

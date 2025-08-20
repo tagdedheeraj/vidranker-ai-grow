@@ -1,15 +1,32 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Image, Download, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { adMobService } from "@/services/admob";
 
 const ThumbnailGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+
+  const saveToHistory = (data: { prompt: string; imageUrl: string }) => {
+    try {
+      const history = JSON.parse(localStorage.getItem('thumbnail-history') || '[]');
+      const newEntry = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        ...data
+      };
+      history.unshift(newEntry);
+      // Keep only last 50 entries
+      const trimmedHistory = history.slice(0, 50);
+      localStorage.setItem('thumbnail-history', JSON.stringify(trimmedHistory));
+    } catch (error) {
+      console.error('Error saving to history:', error);
+    }
+  };
 
   const generateThumbnail = async () => {
     if (!prompt.trim()) {
@@ -29,8 +46,18 @@ const ThumbnailGenerator = () => {
         // Using a placeholder service for demo
         const imageUrl = `https://picsum.photos/1280/720?random=${Date.now()}`;
         setGeneratedImage(imageUrl);
+        
+        // Save to history
+        saveToHistory({
+          prompt,
+          imageUrl
+        });
+        
         setIsGenerating(false);
         toast.success("Thumbnail generated successfully!");
+        
+        // Show interstitial ad after successful generation
+        adMobService.showInterstitialAfterAction();
       }, 3000);
       
     } catch (error) {

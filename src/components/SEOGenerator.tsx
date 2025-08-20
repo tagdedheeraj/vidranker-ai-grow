@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Copy, Search, Sparkles, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { adMobService } from "@/services/admob";
 
 const SEOGenerator = () => {
   const [keyword, setKeyword] = useState("");
@@ -16,6 +16,23 @@ const SEOGenerator = () => {
     title: string;
     description: string;
   } | null>(null);
+
+  const saveToHistory = (data: { tags: string[]; title: string; description: string; keyword: string }) => {
+    try {
+      const history = JSON.parse(localStorage.getItem('seo-history') || '[]');
+      const newEntry = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        ...data
+      };
+      history.unshift(newEntry);
+      // Keep only last 50 entries
+      const trimmedHistory = history.slice(0, 50);
+      localStorage.setItem('seo-history', JSON.stringify(trimmedHistory));
+    } catch (error) {
+      console.error('Error saving to history:', error);
+    }
+  };
 
   const generateSEOContent = async () => {
     if (!keyword.trim()) {
@@ -53,14 +70,25 @@ const SEOGenerator = () => {
 
 #${keyword.replace(/\s+/g, '')} #YouTube #ContentCreator #Growth #2024`;
 
-      setGeneratedData({
+      const generatedContent = {
         tags: sampleTags,
         title: sampleTitle,
         description: sampleDescription
+      };
+
+      setGeneratedData(generatedContent);
+      
+      // Save to history
+      saveToHistory({
+        ...generatedContent,
+        keyword
       });
       
       setIsGenerating(false);
       toast.success("SEO content generated successfully!");
+      
+      // Show interstitial ad after successful generation
+      adMobService.showInterstitialAfterAction();
     }, 2000);
   };
 

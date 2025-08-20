@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
+import { Capacitor } from "@capacitor/core";
 import Header from "./components/Header";
 import BottomNavigation from "./components/BottomNavigation";
 import Home from "./pages/Home";
@@ -21,23 +22,30 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    // Initialize AdMob when app starts (only on mobile)
-    const initializeAds = async () => {
+    const initializeApp = async () => {
       try {
-        console.log("Initializing app...");
-        await adMobService.initialize();
+        console.log("App starting...");
+        console.log("Platform:", Capacitor.getPlatform());
         
-        // Show banner ad after a delay to avoid affecting initial load
-        setTimeout(() => {
-          adMobService.showBanner();
-        }, 3000);
+        // Only initialize AdMob on native platforms
+        if (Capacitor.isNativePlatform()) {
+          console.log("Native platform detected, initializing AdMob...");
+          await adMobService.initialize();
+          
+          // Show banner ad after app is fully loaded
+          setTimeout(() => {
+            adMobService.showBanner();
+          }, 3000);
+        } else {
+          console.log("Web platform detected, skipping AdMob initialization");
+        }
       } catch (error) {
-        console.error("Error initializing ads:", error);
-        // Don't crash the app if ads fail
+        console.error("Error during app initialization:", error);
+        // Don't crash the app if initialization fails
       }
     };
 
-    initializeAds();
+    initializeApp();
   }, []);
 
   return (

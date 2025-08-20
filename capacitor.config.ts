@@ -20,8 +20,9 @@ const config: CapacitorConfig = {
       splashImmersive: true,
     },
     AdMob: {
-      applicationId: 'ca-app-pub-3940256099942544~3347511713', // Test app ID
-      initializeForTesting: true,
+      applicationId: 'ca-app-pub-YOUR_PUBLISHER_ID~YOUR_APP_ID', // Replace with your actual publisher ID
+      initializeForTesting: false, // Set to false for production
+      testDeviceIds: ['2077ef9a63d2b398840261c8221a0c9b'], // Your test device IDs
     },
   },
   android: {

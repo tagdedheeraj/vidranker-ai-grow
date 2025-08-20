@@ -1,0 +1,93 @@
+
+import { AdMob } from '@capacitor-community/admob';
+import { toast } from 'sonner';
+
+class AdMobService {
+  private isInitialized = false;
+  private initializationAttempted = false;
+
+  async initialize() {
+    if (this.initializationAttempted) return;
+    this.initializationAttempted = true;
+
+    try {
+      console.log("Initializing AdMob...");
+      
+      await AdMob.initialize({
+        requestTrackingAuthorization: true,
+        testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
+        initializeForTesting: true,
+      });
+
+      this.isInitialized = true;
+      console.log("AdMob initialized successfully");
+    } catch (error) {
+      console.error("AdMob initialization failed:", error);
+      // Don't throw error to prevent app crash
+      this.isInitialized = false;
+    }
+  }
+
+  async showBanner() {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      if (!this.isInitialized) {
+        console.log("AdMob not initialized, skipping banner");
+        return;
+      }
+
+      await AdMob.showBanner({
+        adId: 'ca-app-pub-3940256099942544/6300978111', // Test ad unit ID
+        adSize: 'BANNER',
+        position: 'BOTTOM_CENTER',
+        margin: 0,
+        isTesting: true
+      });
+
+      console.log("Banner ad shown successfully");
+    } catch (error) {
+      console.error("Failed to show banner ad:", error);
+      // Don't show error to user, just log it
+    }
+  }
+
+  async showInterstitial() {
+    try {
+      if (!this.isInitialized) {
+        await this.initialize();
+      }
+
+      if (!this.isInitialized) {
+        console.log("AdMob not initialized, skipping interstitial");
+        return;
+      }
+
+      await AdMob.prepareInterstitial({
+        adId: 'ca-app-pub-3940256099942544/1033173712', // Test ad unit ID
+        isTesting: true
+      });
+
+      await AdMob.showInterstitial();
+      console.log("Interstitial ad shown successfully");
+    } catch (error) {
+      console.error("Failed to show interstitial ad:", error);
+      // Don't show error to user, just log it
+    }
+  }
+
+  async hideBanner() {
+    try {
+      if (this.isInitialized) {
+        await AdMob.hideBanner();
+        console.log("Banner ad hidden");
+      }
+    } catch (error) {
+      console.error("Failed to hide banner ad:", error);
+    }
+  }
+}
+
+export const adMobService = new AdMobService();

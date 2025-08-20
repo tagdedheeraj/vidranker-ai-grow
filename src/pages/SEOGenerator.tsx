@@ -89,8 +89,23 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
       };
 
       setGeneratedData(data);
+      
+      // Auto-save to history
+      console.log("Saving SEO content to history...");
+      try {
+        const savedItem = saveContent({
+          type: 'seo',
+          title: `SEO: ${keyword}`,
+          content: data
+        });
+        console.log("SEO content saved successfully:", savedItem);
+        toast.success("SEO content generated and saved to history!");
+      } catch (error) {
+        console.error("Error saving SEO content:", error);
+        toast.success("SEO content generated!");
+      }
+      
       setIsGenerating(false);
-      toast.success("SEO content generated successfully!");
     }, 2000);
   };
 
@@ -102,13 +117,17 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
   const saveToHistory = () => {
     if (!generatedData) return;
     
-    saveContent({
-      type: 'seo',
-      title: `SEO: ${keyword}`,
-      content: generatedData
-    });
-    
-    toast.success("Content saved to history!");
+    try {
+      saveContent({
+        type: 'seo',
+        title: `SEO: ${keyword}`,
+        content: generatedData
+      });
+      toast.success("Content saved to history!");
+    } catch (error) {
+      console.error("Error saving to history:", error);
+      toast.error("Failed to save to history");
+    }
   };
 
   return (
@@ -200,7 +219,6 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
-          {/* Hashtags */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -229,7 +247,6 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
-          {/* Title */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -252,7 +269,6 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
-          {/* Description */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">

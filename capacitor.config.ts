@@ -12,13 +12,23 @@ const config: CapacitorConfig = {
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
-      backgroundColor: '#FF0000',
+      backgroundColor: '#ffffff',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
     },
+    AdMob: {
+      applicationId: 'ca-app-pub-3940256099942544~3347511713', // Test app ID
+      initializeForTesting: true,
+    },
+  },
+  android: {
+    allowMixedContent: true,
+  },
+  ios: {
+    contentInset: 'automatic',
   },
 };
 

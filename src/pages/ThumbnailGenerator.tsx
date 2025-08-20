@@ -66,8 +66,23 @@ const ThumbnailGenerator = () => {
       const imageUrl = URL.createObjectURL(blob);
       
       setGeneratedImage(imageUrl);
+      
+      // Auto-save to history
+      console.log("Saving thumbnail to history...");
+      try {
+        const savedItem = saveContent({
+          type: 'thumbnail',
+          title: `Thumbnail: ${prompt.substring(0, 30)}...`,
+          content: { prompt, imageUrl, style: selectedStyle }
+        });
+        console.log("Thumbnail saved successfully:", savedItem);
+        toast.success("Thumbnail generated and saved to history!");
+      } catch (error) {
+        console.error("Error saving thumbnail:", error);
+        toast.success("Thumbnail generated successfully!");
+      }
+      
       setIsGenerating(false);
-      toast.success("Thumbnail generated successfully!");
       
     } catch (error) {
       console.error("Error generating thumbnail:", error);
@@ -76,6 +91,19 @@ const ThumbnailGenerator = () => {
       toast.error("API temporarily unavailable. Using demo image.");
       const placeholderUrl = `https://picsum.photos/1024/576?random=${Date.now()}`;
       setGeneratedImage(placeholderUrl);
+      
+      // Save fallback image to history
+      try {
+        saveContent({
+          type: 'thumbnail',
+          title: `Thumbnail: ${prompt.substring(0, 30)}...`,
+          content: { prompt, imageUrl: placeholderUrl, style: selectedStyle }
+        });
+        console.log("Demo thumbnail saved to history");
+      } catch (saveError) {
+        console.error("Error saving demo thumbnail:", saveError);
+      }
+      
       setIsGenerating(false);
     }
   };
@@ -114,13 +142,17 @@ const ThumbnailGenerator = () => {
   const saveToHistory = () => {
     if (!generatedImage) return;
     
-    saveContent({
-      type: 'thumbnail',
-      title: `Thumbnail: ${prompt.substring(0, 30)}...`,
-      content: { prompt, imageUrl: generatedImage, style: selectedStyle }
-    });
-    
-    toast.success("Thumbnail saved to history!");
+    try {
+      saveContent({
+        type: 'thumbnail',
+        title: `Thumbnail: ${prompt.substring(0, 30)}...`,
+        content: { prompt, imageUrl: generatedImage, style: selectedStyle }
+      });
+      toast.success("Thumbnail saved to history!");
+    } catch (error) {
+      console.error("Error saving to history:", error);
+      toast.error("Failed to save to history");
+    }
   };
 
   return (
@@ -165,7 +197,6 @@ const ThumbnailGenerator = () => {
         </CardContent>
       </Card>
 
-      {/* Input Section */}
       <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

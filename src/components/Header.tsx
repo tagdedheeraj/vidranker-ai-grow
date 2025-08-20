@@ -18,7 +18,7 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-blue-600/95 backdrop-blur supports-[backdrop-filter]:bg-blue-600/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 shadow-sm">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
@@ -37,8 +37,8 @@ const Header = () => {
               to={item.href}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive(item.href)
-                  ? "bg-white/20 text-white"
-                  : "text-white/80 hover:text-white hover:bg-white/10"
+                  ? "bg-primary text-white"
+                  : "text-gray-700 hover:text-primary hover:bg-gray-100"
               }`}
             >
               <span>{item.icon}</span>
@@ -50,7 +50,7 @@ const Header = () => {
         {/* Settings & Mobile Menu */}
         <div className="flex items-center gap-2">
           <Link to="/settings">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-gray-700 hover:bg-gray-100">
               <Settings className="w-5 h-5" />
             </Button>
           </Link>
@@ -59,7 +59,7 @@ const Header = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-white hover:bg-white/10"
+            className="md:hidden text-gray-700 hover:bg-gray-100"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -69,7 +69,7 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-white/20 bg-blue-600">
+        <div className="md:hidden border-t border-gray-200 bg-white">
           <nav className="container mx-auto px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
@@ -77,8 +77,8 @@ const Header = () => {
                 to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? "bg-white/20 text-white"
-                    : "text-white/80 hover:text-white hover:bg-white/10"
+                    ? "bg-primary text-white"
+                    : "text-gray-700 hover:text-primary hover:bg-gray-100"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >

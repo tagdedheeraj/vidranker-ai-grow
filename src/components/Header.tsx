@@ -22,9 +22,11 @@ const Header = () => {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">VR</span>
-          </div>
+          <img 
+            src="/lovable-uploads/a6a00537-f7df-440b-8202-0d29be1ea43d.png" 
+            alt="VidRanker Logo" 
+            className="w-10 h-10 rounded-lg"
+          />
           <span className="font-bold text-lg gradient-text">VidRanker</span>
         </Link>
 

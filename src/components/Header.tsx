@@ -18,16 +18,15 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-blue-600/95 backdrop-blur supports-[backdrop-filter]:bg-blue-600/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <img 
             src="/lovable-uploads/a6a00537-f7df-440b-8202-0d29be1ea43d.png" 
-            alt="VidRanker Logo" 
+            alt="Logo" 
             className="w-10 h-10 rounded-lg"
           />
-          <span className="font-bold text-lg gradient-text">VidRanker</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -38,8 +37,8 @@ const Header = () => {
               to={item.href}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 isActive(item.href)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-white/20 text-white"
+                  : "text-white/80 hover:text-white hover:bg-white/10"
               }`}
             >
               <span>{item.icon}</span>
@@ -51,7 +50,7 @@ const Header = () => {
         {/* Settings & Mobile Menu */}
         <div className="flex items-center gap-2">
           <Link to="/settings">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <Settings className="w-5 h-5" />
             </Button>
           </Link>
@@ -60,7 +59,7 @@ const Header = () => {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="md:hidden text-white hover:bg-white/10"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -70,7 +69,7 @@ const Header = () => {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t bg-background">
+        <div className="md:hidden border-t border-white/20 bg-blue-600">
           <nav className="container mx-auto px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
@@ -78,8 +77,8 @@ const Header = () => {
                 to={item.href}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                   isActive(item.href)
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    ? "bg-white/20 text-white"
+                    : "text-white/80 hover:text-white hover:bg-white/10"
                 }`}
                 onClick={() => setIsMenuOpen(false)}
               >

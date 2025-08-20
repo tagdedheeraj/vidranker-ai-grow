@@ -1,5 +1,5 @@
 
-import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition, InterstitialAdOptions } from '@capacitor-community/admob';
+import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import { toast } from 'sonner';
 
 class AdMobService {
@@ -65,12 +65,11 @@ class AdMobService {
         return;
       }
 
-      const interstitialOptions: InterstitialAdOptions = {
+      await AdMob.prepareInterstitial({
         adId: 'ca-app-pub-3940256099942544/1033173712', // Test ad unit ID
         isTesting: true
-      };
+      });
 
-      await AdMob.prepareInterstitial(interstitialOptions);
       await AdMob.showInterstitial();
       console.log("Interstitial ad shown successfully");
     } catch (error) {

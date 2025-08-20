@@ -1,18 +1,15 @@
 
-import HeroSection from "@/components/HeroSection";
-import SEOGenerator from "@/components/SEOGenerator";
-import ThumbnailGenerator from "@/components/ThumbnailGenerator";
-import Footer from "@/components/Footer";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  return (
-    <div className="min-h-screen">
-      <HeroSection />
-      <SEOGenerator />
-      <ThumbnailGenerator />
-      <Footer />
-    </div>
-  );
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    navigate("/", { replace: true });
+  }, [navigate]);
+
+  return null;
 };
 
 export default Index;

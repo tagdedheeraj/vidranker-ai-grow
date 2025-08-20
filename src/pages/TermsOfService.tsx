@@ -39,7 +39,7 @@ const TermsOfService = () => {
           <section>
             <h2 className="text-xl font-semibold mb-3">Description of Service</h2>
             <p className="text-muted-foreground">
-              VidRanker is a mobile application that provides AI-powered tools for YouTube content creators, including:
+              VidRanker is a mobile application that provides AI-powered tools for video content creators, including:
             </p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground mt-3">
               <li>SEO content generation (tags, titles, descriptions)</li>
@@ -65,7 +65,7 @@ const TermsOfService = () => {
             </p>
             <ul className="list-disc list-inside space-y-2 text-muted-foreground mt-3">
               <li>Reviewing and editing generated content before use</li>
-              <li>Ensuring content compliance with YouTube's terms of service</li>
+              <li>Ensuring content compliance with platform terms of service</li>
               <li>Verifying accuracy and appropriateness of generated content</li>
               <li>Taking full responsibility for content you publish</li>
             </ul>
@@ -75,7 +75,7 @@ const TermsOfService = () => {
             <h2 className="text-xl font-semibold mb-3">Intellectual Property</h2>
             <p className="text-muted-foreground">
               The VidRanker app, including its design, functionality, and original content, is owned by us and protected by copyright laws. 
-              Content you generate using the app belongs to you, but you grant us the right to use aggregated, anonymized data to improve our services.
+              Content you generate using the app belongs to you.
             </p>
           </section>
 

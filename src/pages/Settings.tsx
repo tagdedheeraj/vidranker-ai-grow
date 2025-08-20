@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings2, Info, Heart, Github, Twitter, Star, Zap } from "lucide-react";
+import { Settings2, Info, Heart, Github, Twitter, Star, Zap, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { clearAllContent } from "@/utils/localStorage";
 
@@ -52,6 +52,39 @@ const Settings = () => {
         </CardContent>
       </Card>
 
+      {/* Privacy First */}
+      <Card className="glass">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            Privacy First
+          </CardTitle>
+          <CardDescription>
+            Your privacy is our priority
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">Local Storage Only</p>
+              <p className="text-sm text-muted-foreground">All your content is stored locally on your device only</p>
+            </div>
+            <Badge variant="outline" className="text-green-600 border-green-600">
+              Private
+            </Badge>
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium">No External Upload</p>
+              <p className="text-sm text-muted-foreground">Nothing is uploaded to external servers</p>
+            </div>
+            <Badge variant="outline" className="text-green-600 border-green-600">
+              Secure
+            </Badge>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Data Management */}
       <Card className="glass">
         <CardHeader>
@@ -60,20 +93,10 @@ const Settings = () => {
             Data Management
           </CardTitle>
           <CardDescription>
-            All your data is stored locally on your device for privacy
+            Manage your locally stored content
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Local Storage</p>
-              <p className="text-sm text-muted-foreground">Your content is saved on this device only</p>
-            </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              Private
-            </Badge>
-          </div>
-          
           <div className="pt-4 border-t">
             <Button
               variant="destructive"
@@ -130,9 +153,8 @@ const Settings = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            VidRanker is an AI-powered tool designed to help YouTube content creators optimize their videos 
-            for better visibility and engagement. Generate SEO-optimized tags, descriptions, and stunning 
-            thumbnails to boost your channel growth.
+            VidRanker is an AI-powered tool to help creators optimize videos with SEO-friendly tags, 
+            descriptions, and thumbnails — designed to support your creative journey.
           </p>
           
           <div className="flex items-center justify-center gap-4 pt-4">
@@ -151,7 +173,7 @@ const Settings = () => {
           </div>
           
           <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-            <p>© 2024 VidRanker. Built with ❤️ for YouTube creators</p>
+            <p>© 2025 VidRanker. Built with ❤️ for creators</p>
             <p className="mt-1">Made with Lovable AI 🚀</p>
           </div>
         </CardContent>

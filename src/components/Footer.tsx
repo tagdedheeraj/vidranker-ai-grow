@@ -11,7 +11,7 @@ const Footer = () => {
           </div>
           
           <p className="text-muted-foreground max-w-md mx-auto">
-            Boost Your YouTube Growth with AI-powered SEO tags and stunning thumbnails. 
+            Boost your video growth with AI-powered SEO tags and stunning thumbnails. 
             Created with ❤️ for content creators.
           </p>
           
@@ -33,9 +33,9 @@ const Footer = () => {
           </div>
           
           <div className="text-sm text-muted-foreground pt-4 border-t">
-            <p>© 2024 VidRanker. Built with Lovable AI 🚀</p>
+            <p>© 2025 VidRanker. Built with Lovable AI 🚀</p>
             <p className="flex items-center justify-center gap-1 mt-2">
-              Made with <Heart className="w-4 h-4 text-red-500" /> for YouTube creators
+              Made with <Heart className="w-4 h-4 text-red-500" /> for creators
             </p>
           </div>
         </div>

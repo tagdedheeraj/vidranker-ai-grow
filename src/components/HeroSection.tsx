@@ -24,7 +24,7 @@ const HeroSection = () => {
             </h1>
           </div>
           <p className="text-xl md:text-2xl text-white/90 font-medium">
-            Boost Your YouTube Growth 🚀
+            Boost your video growth 🚀
           </p>
         </div>
 
@@ -34,7 +34,7 @@ const HeroSection = () => {
             Generate SEO-Optimized Tags & Stunning Thumbnails
           </h2>
           <p className="text-lg text-white/80 leading-relaxed">
-            Transform your YouTube content with AI-powered SEO tags, descriptions, and custom thumbnails. 
+            Transform your video content with AI-powered SEO tags, descriptions, and custom thumbnails. 
             Boost your visibility, increase clicks, and grow your channel faster than ever.
           </p>
         </div>
@@ -44,17 +44,17 @@ const HeroSection = () => {
           <div className="glass rounded-2xl p-6 text-white">
             <Zap className="w-12 h-12 mx-auto mb-4 text-yellow-300" />
             <h3 className="text-xl font-semibold mb-2">AI SEO Tags</h3>
-            <p className="text-white/80">Generate optimized tags and descriptions for maximum reach</p>
+            <p className="text-white/80">Generate optimized tags and descriptions to improve discoverability</p>
           </div>
           <div className="glass rounded-2xl p-6 text-white">
             <Play className="w-12 h-12 mx-auto mb-4 text-blue-300" />
             <h3 className="text-xl font-semibold mb-2">Custom Thumbnails</h3>
-            <p className="text-white/80">Create eye-catching thumbnails that drive clicks</p>
+            <p className="text-white/80">Create eye-catching thumbnails designed to attract clicks</p>
           </div>
           <div className="glass rounded-2xl p-6 text-white">
             <TrendingUp className="w-12 h-12 mx-auto mb-4 text-green-300" />
-            <h3 className="text-xl font-semibold mb-2">Boost Growth</h3>
-            <p className="text-white/80">Increase views, engagement, and subscriber growth</p>
+            <h3 className="text-xl font-semibold mb-2">Boost Visibility</h3>
+            <p className="text-white/80">Enhance your chances of getting more engagement and views</p>
           </div>
         </div>
 

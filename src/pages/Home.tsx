@@ -18,21 +18,21 @@ const Home = () => {
     {
       icon: Search,
       title: "AI SEO Tags",
-      description: "Generate optimized tags and descriptions for maximum reach",
+      description: "Generate optimized tags and descriptions to improve discoverability",
       color: "text-blue-500",
       href: "/seo"
     },
     {
       icon: Image,
       title: "Custom Thumbnails",
-      description: "Create eye-catching thumbnails that drive clicks",
+      description: "Create eye-catching thumbnails designed to attract clicks",
       color: "text-green-500",
       href: "/thumbnails"
     },
     {
       icon: TrendingUp,
-      title: "Boost Growth",
-      description: "Increase views, engagement, and subscriber growth",
+      title: "Boost Visibility",
+      description: "Enhance your chances of getting more engagement and views",
       color: "text-purple-500",
       href: "/history"
     }
@@ -56,7 +56,7 @@ const Home = () => {
             Welcome to VidRanker 🚀
           </h1>
           <p className="text-xl text-white/90 mb-6">
-            Boost Your YouTube Growth with AI-powered SEO and Thumbnails
+            Boost your video growth with AI-powered SEO & Thumbnails
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             {quickActions.map((action) => {
@@ -137,21 +137,21 @@ const Home = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="w-5 h-5 text-yellow-500" />
-            Pro Tips for YouTube Success
+            Pro Tips for Creators
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-start gap-3">
             <Badge variant="secondary">1</Badge>
-            <p className="text-sm">Use trending keywords in your titles and descriptions</p>
+            <p className="text-sm">Use trending keywords in your titles & descriptions</p>
           </div>
           <div className="flex items-start gap-3">
             <Badge variant="secondary">2</Badge>
-            <p className="text-sm">Create thumbnails with bright colors and clear text</p>
+            <p className="text-sm">Design thumbnails with bright colors and clear text</p>
           </div>
           <div className="flex items-start gap-3">
             <Badge variant="secondary">3</Badge>
-            <p className="text-sm">Post consistently and engage with your audience</p>
+            <p className="text-sm">Stay consistent and engage with your audience</p>
           </div>
         </CardContent>
       </Card>

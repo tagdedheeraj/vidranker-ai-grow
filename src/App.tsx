@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 });
@@ -32,52 +32,47 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("App starting...");
+        console.log("App starting - VidRanker v1.0");
         console.log("Platform:", Capacitor.getPlatform());
         console.log("Is native platform:", Capacitor.isNativePlatform());
         
-        // Only initialize AdMob on native platforms with enhanced error handling
         if (Capacitor.isNativePlatform()) {
-          console.log("Native platform detected, attempting AdMob initialization...");
+          console.log("Native platform detected - initializing AdMob...");
           
-          try {
-            // Initialize AdMob with longer delay to ensure stability
-            setTimeout(async () => {
-              try {
-                await adMobService.initialize();
-                console.log("AdMob initialization completed");
-                
-                // Show banner ad only if initialization was successful
-                setTimeout(async () => {
-                  try {
-                    if (adMobService.isReady()) {
-                      const success = await adMobService.showBanner();
-                      console.log("Banner ad display result:", success);
-                    } else {
-                      console.log("AdMob not ready, skipping banner ad");
-                    }
-                  } catch (bannerError) {
-                    console.error("Banner ad error (non-fatal, app continues):", bannerError);
+          // Initialize AdMob with enhanced error handling
+          setTimeout(async () => {
+            try {
+              await adMobService.initialize();
+              console.log("AdMob initialization process completed");
+              
+              // Show banner after successful initialization
+              setTimeout(async () => {
+                try {
+                  if (adMobService.isReady()) {
+                    const bannerResult = await adMobService.showBanner();
+                    console.log("Banner ad result:", bannerResult);
+                  } else {
+                    console.log("AdMob not ready - skipping banner");
                   }
-                }, 3000); // Show banner after 3 seconds of successful initialization
-              } catch (initError) {
-                console.error("AdMob initialization failed (non-fatal, app continues):", initError);
-              }
-            }, 5000); // Initialize AdMob after 5 seconds
-          } catch (setupError) {
-            console.error("AdMob setup error (non-fatal, app continues):", setupError);
-          }
+                } catch (bannerError) {
+                  console.error("Banner display error (app continues):", bannerError);
+                }
+              }, 2000);
+            } catch (initError) {
+              console.error("AdMob initialization error (app continues):", initError);
+            }
+          }, 4000); // Delayed initialization for stability
         } else {
-          console.log("Web platform detected, AdMob disabled");
+          console.log("Web platform - AdMob disabled");
         }
         
-        // Log AdMob service status
+        // Log final status
         setTimeout(() => {
-          console.log("AdMob service status:", adMobService.getStatus());
-        }, 6000);
+          const status = adMobService.getStatus();
+          console.log("Final AdMob status:", status);
+        }, 8000);
       } catch (error) {
-        console.error("App initialization error (non-fatal, app continues):", error);
-        // App continues to work even if AdMob completely fails
+        console.error("App initialization error (non-fatal):", error);
       }
     };
 

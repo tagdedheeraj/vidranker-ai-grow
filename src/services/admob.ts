@@ -9,90 +9,98 @@ class AdMobService {
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
+    console.log('AdMobService: Platform detected:', Capacitor.getPlatform());
   }
 
   async initialize() {
     if (this.initializationAttempted || !this.isNativePlatform) {
+      console.log('AdMobService: Skipping initialization - already attempted or not native platform');
       return;
     }
     
     this.initializationAttempted = true;
 
     try {
-      console.log("Initializing AdMob...");
+      console.log("AdMobService: Starting initialization...");
       
       await AdMob.initialize({
         testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-        initializeForTesting: false, // Set to false for production
+        initializeForTesting: true, // Set to false for production
       });
 
       this.isInitialized = true;
-      console.log("AdMob initialized successfully");
+      console.log("AdMobService: Initialized successfully");
     } catch (error) {
-      console.error("AdMob initialization failed:", error);
+      console.error("AdMobService: Initialization failed:", error);
       this.isInitialized = false;
-      // Don't throw to prevent app crash
+      // Gracefully handle initialization failure without crashing
     }
   }
 
   async showBanner() {
     if (!this.isNativePlatform) {
-      console.log("Not on native platform, skipping banner ad");
-      return;
+      console.log("AdMobService: Not on native platform, skipping banner ad");
+      return false;
     }
 
     try {
       if (!this.isInitialized) {
+        console.log("AdMobService: Not initialized, attempting to initialize...");
         await this.initialize();
       }
 
       if (!this.isInitialized) {
-        console.log("AdMob not initialized, skipping banner");
-        return;
+        console.log("AdMobService: Still not initialized, skipping banner");
+        return false;
       }
 
       const bannerOptions: BannerAdOptions = {
-        adId: 'ca-app-pub-YOUR_PUBLISHER_ID/YOUR_BANNER_AD_UNIT_ID', // Replace with your actual ad unit ID
+        // Test Banner Ad Unit ID - replace with your actual ad unit ID for production
+        adId: 'ca-app-pub-3940256099942544/6300978111', // Test ID - replace with ca-app-pub-2211398170597117/YOUR_BANNER_AD_UNIT_ID
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: false // Set to false for production
+        isTesting: true // Set to false for production
       };
 
       await AdMob.showBanner(bannerOptions);
-      console.log("Banner ad shown successfully");
+      console.log("AdMobService: Banner ad shown successfully");
+      return true;
     } catch (error) {
-      console.error("Failed to show banner ad:", error);
-      // Silently fail to prevent crashes
+      console.error("AdMobService: Failed to show banner ad:", error);
+      return false;
     }
   }
 
   async showInterstitial() {
     if (!this.isNativePlatform) {
-      console.log("Not on native platform, skipping interstitial ad");
-      return;
+      console.log("AdMobService: Not on native platform, skipping interstitial ad");
+      return false;
     }
 
     try {
       if (!this.isInitialized) {
+        console.log("AdMobService: Not initialized, attempting to initialize...");
         await this.initialize();
       }
 
       if (!this.isInitialized) {
-        console.log("AdMob not initialized, skipping interstitial");
-        return;
+        console.log("AdMobService: Still not initialized, skipping interstitial");
+        return false;
       }
 
+      // Test Interstitial Ad Unit ID - replace with your actual ad unit ID for production
       await AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-YOUR_PUBLISHER_ID/YOUR_INTERSTITIAL_AD_UNIT_ID', // Replace with your actual ad unit ID
-        isTesting: false // Set to false for production
+        adId: 'ca-app-pub-3940256099942544/1033173712', // Test ID - replace with ca-app-pub-2211398170597117/YOUR_INTERSTITIAL_AD_UNIT_ID
+        isTesting: true // Set to false for production
       });
 
       await AdMob.showInterstitial();
-      console.log("Interstitial ad shown successfully");
+      console.log("AdMobService: Interstitial ad shown successfully");
+      return true;
     } catch (error) {
-      console.error("Failed to show interstitial ad:", error);
-      // Silently fail to prevent crashes
+      console.error("AdMobService: Failed to show interstitial ad:", error);
+      return false;
     }
   }
 
@@ -104,23 +112,40 @@ class AdMobService {
     try {
       if (this.isInitialized) {
         await AdMob.hideBanner();
-        console.log("Banner ad hidden");
+        console.log("AdMobService: Banner ad hidden");
       }
     } catch (error) {
-      console.error("Failed to hide banner ad:", error);
+      console.error("AdMobService: Failed to hide banner ad:", error);
     }
   }
 
-  // Method to show interstitial after user actions
+  // Method to show interstitial after user actions with delay
   async showInterstitialAfterAction() {
     if (!this.isNativePlatform) {
       return;
     }
 
-    // Add a small delay to ensure smooth user experience
-    setTimeout(() => {
-      this.showInterstitial();
+    // Add delay to ensure smooth user experience
+    setTimeout(async () => {
+      const success = await this.showInterstitial();
+      if (!success) {
+        console.log("AdMobService: Interstitial ad not shown, continuing without interruption");
+      }
     }, 1000);
+  }
+
+  // Check if AdMob is ready
+  isReady(): boolean {
+    return this.isInitialized && this.isNativePlatform;
+  }
+
+  // Get initialization status
+  getStatus() {
+    return {
+      isNativePlatform: this.isNativePlatform,
+      isInitialized: this.isInitialized,
+      initializationAttempted: this.initializationAttempted
+    };
   }
 }
 

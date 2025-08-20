@@ -1,0 +1,29 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This is a template for AndroidManifest.xml that will be created when you run 'npx cap add android' -->
+<!-- After adding Android platform, add these permissions and meta-data to android/app/src/main/AndroidManifest.xml -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <!-- Add these permissions for AdMob -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        
+        <!-- Add AdMob App ID meta-data -->
+        <!-- Replace ca-app-pub-2211398170597117~1234567890 with your actual AdMob App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-2211398170597117~1234567890"/>
+            
+        <!-- Your main activity and other configurations will be here -->
+        
+    </application>
+</manifest>

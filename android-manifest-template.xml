@@ -18,10 +18,10 @@
         android:theme="@style/AppTheme">
         
         <!-- Add AdMob App ID meta-data -->
-        <!-- Replace ca-app-pub-2211398170597117~1234567890 with your actual AdMob App ID -->
+        <!-- Updated with your real AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-2211398170597117~1234567890"/>
+            android:value="ca-app-pub-2211398170597117~9683407494"/>
             
         <!-- Your main activity and other configurations will be here -->
         

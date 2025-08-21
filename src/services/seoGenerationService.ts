@@ -82,7 +82,7 @@ Format the response as JSON with keys: tags, title, description, hashtags`;
       `${keyword} tutorial`,
       `${keyword} guide`,
       `${keyword} tips`,
-      `${keyword} 2024`,
+      `${keyword} 2025`,
       `how to ${keyword}`,
       `${keyword} for beginners`,
       `${keyword} secrets`,
@@ -100,7 +100,7 @@ Format the response as JSON with keys: tags, title, description, hashtags`;
       "#YouTube",
       "#ContentCreator", 
       "#Growth",
-      "#2024",
+      "#2025",
       "#Tutorial",
       "#Tips",
       "#Viral",
@@ -108,9 +108,9 @@ Format the response as JSON with keys: tags, title, description, hashtags`;
       "#Marketing"
     ];
 
-    const title = `${keyword} - Complete Guide for 2024 | Boost Your YouTube Growth 🚀`;
+    const title = `${keyword} - Complete Guide for 2025 | Boost Your YouTube Growth 🚀`;
     
-    const description = `🚀 Master ${keyword} with this comprehensive guide! Learn proven strategies to grow your YouTube channel, increase views, and boost engagement. Perfect for content creators looking to dominate in 2024.
+    const description = `🚀 Master ${keyword} with this comprehensive guide! Learn proven strategies to grow your YouTube channel, increase views, and boost engagement. Perfect for content creators looking to dominate in 2025.
 
 🔥 What you'll learn:
 • Advanced ${keyword} techniques

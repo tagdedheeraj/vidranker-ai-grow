@@ -86,7 +86,7 @@ const SEOGenerator = () => {
           AI SEO Content Generator
         </h1>
         <p className="text-lg text-muted-foreground">
-          Enter your video topic and get AI-powered tags, titles, and descriptions
+          Enter your video topic and get AI-powered tags, titles, and descriptions for 2025
         </p>
       </div>
 
@@ -98,7 +98,7 @@ const SEOGenerator = () => {
             Enter Your Video Topic
           </CardTitle>
           <CardDescription>
-            Describe your video content or enter main keywords for AI generation
+            Describe your video content or enter main keywords for AI generation (optimized for 2025)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -116,12 +116,12 @@ const SEOGenerator = () => {
             {isGenerating ? (
               <>
                 <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                AI is Creating Amazing Content...
+                AI is Creating Amazing Content for 2025...
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 mr-2" />
-                Generate AI SEO Content
+                Generate AI SEO Content for 2025
               </>
             )}
           </Button>

@@ -7,13 +7,14 @@ export interface ImageGenerationResult {
 }
 
 export class ImageGenerationService {
-  private static readonly API_KEY = "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";
+  // Updated with a fresh API key - users should replace with their own
+  private static readonly API_KEY = "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";
   private static readonly TIMEOUT = 30000; // 30 seconds
   
   private static readonly FALLBACK_SERVICES = [
     (seed: number) => `https://picsum.photos/1024/576?random=${seed}`,
-    (seed: number) => `https://source.unsplash.com/1024x576/?thumbnail,youtube&sig=${seed}`,
-    (seed: number) => `https://via.placeholder.com/1024x576/ff6b35/ffffff?text=Sample+Thumbnail&seed=${seed}`,
+    (seed: number) => `https://source.unsplash.com/1024x576/?youtube,thumbnail&sig=${seed}`,
+    (seed: number) => `https://via.placeholder.com/1024x576/4f46e5/ffffff?text=YouTube+Thumbnail&cache=${seed}`,
   ];
 
   static async generateImage(prompt: string, style: string = 'photorealistic'): Promise<ImageGenerationResult> {
@@ -41,7 +42,7 @@ export class ImageGenerationService {
       } catch (fallbackError) {
         console.warn('Fallback services failed:', fallbackError);
         
-        // Generate SVG placeholder
+        // Generate SVG placeholder as last resort
         const imageUrl = this.generatePlaceholder(prompt);
         return {
           success: true,
@@ -58,7 +59,7 @@ export class ImageGenerationService {
 
     try {
       const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
         {
           headers: {
             Authorization: `Bearer ${this.API_KEY}`,
@@ -70,8 +71,7 @@ export class ImageGenerationService {
             parameters: {
               width: 1024,
               height: 576,
-              num_inference_steps: 20,
-              guidance_scale: 7.5,
+              num_inference_steps: 4,
             },
           }),
           signal: controller.signal,
@@ -103,22 +103,27 @@ export class ImageGenerationService {
   }
 
   private static async generateWithFallback(): Promise<string> {
-    const seed = Date.now();
+    const seed = Math.floor(Math.random() * 1000000);
     
     for (let i = 0; i < this.FALLBACK_SERVICES.length; i++) {
       try {
         const url = this.FALLBACK_SERVICES[i](seed + i);
         
-        // Test if image loads
-        await new Promise((resolve, reject) => {
+        // Test if image loads with a more lenient approach
+        const testPromise = new Promise<string>((resolve, reject) => {
           const img = new Image();
-          img.onload = resolve;
-          img.onerror = reject;
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(url);
+          img.onerror = () => reject(new Error(`Service ${i + 1} failed`));
           img.src = url;
-          setTimeout(reject, 5000); // 5 second timeout per service
         });
         
-        return url;
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('Timeout')), 8000);
+        });
+        
+        return await Promise.race([testPromise, timeoutPromise]);
+        
       } catch (error) {
         console.log(`Fallback service ${i + 1} failed:`, error);
         continue;
@@ -131,7 +136,7 @@ export class ImageGenerationService {
   private static generatePlaceholder(prompt: string): string {
     const colors = ['#4f46e5', '#059669', '#dc2626', '#7c3aed', '#ea580c'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const shortPrompt = prompt.substring(0, 20) + (prompt.length > 20 ? '...' : '');
+    const shortPrompt = prompt.substring(0, 15) + (prompt.length > 15 ? '...' : '');
     
     const svg = `
       <svg width="1024" height="576" xmlns="http://www.w3.org/2000/svg">
@@ -142,10 +147,10 @@ export class ImageGenerationService {
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#grad)"/>
-        <text x="50%" y="40%" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="white" text-anchor="middle" dy="0.35em">
-          VidRanker
-        </text>
-        <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="24" fill="white" text-anchor="middle" dy="0.35em">
+        <circle cx="200" cy="200" r="80" fill="white" opacity="0.2"/>
+        <circle cx="800" cy="400" r="60" fill="white" opacity="0.3"/>
+        <rect x="100" y="450" width="824" height="80" rx="40" fill="rgba(0,0,0,0.7)"/>
+        <text x="512" y="500" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle">
           ${shortPrompt}
         </text>
       </svg>

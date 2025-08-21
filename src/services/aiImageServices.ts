@@ -11,37 +11,55 @@ const HUGGINGFACE_API_KEY = "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";
 export class HuggingFaceService implements AIImageService {
   name = 'Hugging Face';
   private apiKey = HUGGINGFACE_API_KEY;
+  private models = [
+    "runwayml/stable-diffusion-v1-5",
+    "CompVis/stable-diffusion-v1-4",
+    "stabilityai/stable-diffusion-2-1"
+  ];
 
   async isAvailable(): Promise<boolean> {
-    try {
-      // Test with a more stable model for availability check
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
-        {
-          headers: { 
-            Authorization: `Bearer ${this.apiKey}`,
-            "Content-Type": "application/json"
-          },
-          method: "POST",
-          body: JSON.stringify({
-            inputs: "test image",
-            parameters: {
-              num_inference_steps: 1
-            }
-          })
+    console.log('🔍 Testing API key availability with multiple models...');
+    
+    for (const model of this.models) {
+      try {
+        const response = await fetch(
+          `https://api-inference.huggingface.co/models/${model}`,
+          {
+            headers: { 
+              Authorization: `Bearer ${this.apiKey}`,
+              "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify({
+              inputs: "test",
+              parameters: { num_inference_steps: 1 }
+            })
+          }
+        );
+        
+        console.log(`🔍 Model ${model} response:`, response.status);
+        
+        if (response.status === 200 || response.status === 503) {
+          console.log(`✅ Found working model: ${model}`);
+          return true;
         }
-      );
-      
-      console.log('🔍 API availability check response:', response.status);
-      return response.status !== 401 && response.status !== 403;
-    } catch (error) {
-      console.error('❌ API availability check failed:', error);
-      return false;
+        
+        if (response.status === 401 || response.status === 403) {
+          console.log(`❌ Authentication failed for model: ${model}`);
+          continue;
+        }
+        
+      } catch (error) {
+        console.log(`❌ Error testing model ${model}:`, error);
+        continue;
+      }
     }
+    
+    console.log('❌ All models failed authentication check');
+    return false;
   }
 
   async generate(prompt: string, style: string): Promise<string> {
-    // Enhanced prompt engineering for better YouTube thumbnails
     const styleMap = {
       'photorealistic': 'photorealistic, high quality, professional photography, realistic, detailed',
       'cartoon': 'cartoon style, animated, colorful, fun, illustration, cartoon art',
@@ -50,82 +68,90 @@ export class HuggingFaceService implements AIImageService {
     };
 
     const stylePrompt = styleMap[style as keyof typeof styleMap] || styleMap.photorealistic;
-    
     const enhancedPrompt = `YouTube thumbnail: ${prompt}, ${stylePrompt}, bright vibrant colors, high contrast, eye-catching design, professional quality, 16:9 aspect ratio, bold composition, attention-grabbing, trending thumbnail style, masterpiece, best quality`;
     
-    console.log('🎨 Generating with Hugging Face (Updated API Key):', enhancedPrompt);
+    console.log('🎨 Generating with enhanced prompt:', enhancedPrompt);
     
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+    let lastError: Error | null = null;
+    
+    // Try each model until one works
+    for (let i = 0; i < this.models.length; i++) {
+      const model = this.models[i];
+      console.log(`🚀 Attempting generation with model ${i + 1}/${this.models.length}: ${model}`);
+      
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
 
-    try {
-      // Using more stable Stable Diffusion v1.5 model
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/runwayml/stable-diffusion-v1-5",
-        {
-          headers: {
-            Authorization: `Bearer ${this.apiKey}`,
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify({
-            inputs: enhancedPrompt,
-            parameters: {
-              num_inference_steps: 20,
-              guidance_scale: 7.5,
-              width: 512,
-              height: 288,
-              negative_prompt: "blurry, low quality, distorted, ugly, bad anatomy, text, watermark, signature, duplicate, multiple faces"
+        const response = await fetch(
+          `https://api-inference.huggingface.co/models/${model}`,
+          {
+            headers: {
+              Authorization: `Bearer ${this.apiKey}`,
+              "Content-Type": "application/json",
             },
-          }),
-          signal: controller.signal,
-        }
-      );
+            method: "POST",
+            body: JSON.stringify({
+              inputs: enhancedPrompt,
+              parameters: {
+                num_inference_steps: 20,
+                guidance_scale: 7.5,
+                width: 512,
+                height: 288,
+                negative_prompt: "blurry, low quality, distorted, ugly, bad anatomy, text, watermark, signature"
+              },
+            }),
+            signal: controller.signal,
+          }
+        );
 
-      clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
+        console.log(`🔍 Model ${model} response status:`, response.status);
 
-      console.log('🔍 HuggingFace API Response Status:', response.status);
-      console.log('📝 API Key used:', `${this.apiKey.substring(0, 10)}...`);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ HuggingFace API Error:', response.status, errorText);
-        
-        if (response.status === 401) {
-          throw new Error('API key authentication failed. Please verify your Hugging Face API key has write permissions.');
-        } else if (response.status === 403) {
-          throw new Error('API access forbidden. Your API key may not have the required permissions for image generation.');
+        if (response.status === 200) {
+          const blob = await response.blob();
+          console.log('✅ Successfully generated image, blob size:', blob.size);
+          
+          if (blob.size > 0) {
+            const imageUrl = URL.createObjectURL(blob);
+            console.log(`🎉 Success with model: ${model}`);
+            return imageUrl;
+          } else {
+            throw new Error('Received empty image data');
+          }
         } else if (response.status === 503) {
-          throw new Error('Model is currently loading. This usually takes 20-30 seconds. Please wait and try again.');
-        } else if (response.status === 429) {
-          throw new Error('Rate limit exceeded. Please wait a moment before making another request.');
-        } else if (response.status === 500) {
-          throw new Error('Server error occurred. The model may be overloaded, please try again in a few moments.');
+          const errorData = await response.json().catch(() => ({}));
+          if (errorData.error?.includes('loading')) {
+            console.log(`⏳ Model ${model} is loading, trying next model...`);
+            lastError = new Error(`Model ${model} is loading. Trying alternative model...`);
+            continue;
+          }
+        } else if (response.status === 401 || response.status === 403) {
+          console.log(`🔑 Authentication failed for model ${model}, trying next...`);
+          lastError = new Error(`Access denied for model ${model}. Your API key may need permissions for this model.`);
+          continue;
         } else {
-          throw new Error(`API Error ${response.status}: ${errorText || 'Please check your API key and try again'}`);
+          const errorText = await response.text().catch(() => 'Unknown error');
+          console.log(`❌ Model ${model} failed with status ${response.status}:`, errorText);
+          lastError = new Error(`Model ${model} failed: ${errorText}`);
+          continue;
         }
+        
+      } catch (error) {
+        clearTimeout(timeoutId);
+        console.error(`❌ Error with model ${model}:`, error);
+        
+        if (error instanceof Error && error.name === 'AbortError') {
+          lastError = new Error(`Model ${model} timed out. Trying next model...`);
+        } else {
+          lastError = error as Error;
+        }
+        continue;
       }
-
-      const blob = await response.blob();
-      console.log('✅ Image blob received, size:', blob.size);
-      
-      if (blob.size === 0) {
-        throw new Error('Received empty response from API. The model may still be loading, please try again.');
-      }
-      
-      const imageUrl = URL.createObjectURL(blob);
-      console.log('🖼️ Image URL created successfully');
-      
-      return imageUrl;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error('❌ HuggingFace generation failed:', error);
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Request timed out. The model may be loading, please try again.');
-      }
-      
-      throw error;
     }
+    
+    // All models failed
+    console.error('❌ All Hugging Face models failed');
+    throw lastError || new Error('All available models failed to generate image. Please check your API key permissions.');
   }
 }

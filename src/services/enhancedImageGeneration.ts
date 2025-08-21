@@ -33,32 +33,19 @@ export class EnhancedImageGenerationService {
         onStatusUpdate?.(`🔄 Trying ${service.name} (${i + 1}/${this.aiServices.length})...`);
         console.log(`🔄 Attempting generation with ${service.name}`);
         
-        const isAvailable = await Promise.race([
-          service.isAvailable(),
-          new Promise<boolean>((_, reject) => 
-            setTimeout(() => reject(new Error('Availability check timeout')), 10000)
-          )
-        ]);
-        
-        if (!isAvailable) {
-          console.log(`⚠️ ${service.name} not available, skipping...`);
-          continue;
-        }
-
-        console.log(`✅ ${service.name} is available, generating image...`);
-        
-        const imageUrl = await Promise.race([
-          service.generate(prompt, style),
-          new Promise<string>((_, reject) => 
-            setTimeout(() => reject(new Error('Generation timeout')), 30000)
-          )
-        ]);
-        
-        console.log(`🎯 ${service.name} generated URL:`, imageUrl);
-        
-        // Validate the generated image
-        const isValid = await this.validateImage(imageUrl);
-        if (isValid) {
+        // For HuggingFace, skip availability check and directly try generation
+        if (service.name === 'Hugging Face') {
+          console.log(`✅ ${service.name} - attempting direct generation...`);
+          
+          const imageUrl = await Promise.race([
+            service.generate(prompt, style),
+            new Promise<string>((_, reject) => 
+              setTimeout(() => reject(new Error('Generation timeout')), 60000) // Increased timeout for HF
+            )
+          ]);
+          
+          console.log(`🎯 ${service.name} generated URL:`, imageUrl);
+          
           onStatusUpdate?.(`✅ Successfully generated with ${service.name}!`);
           console.log(`🎉 Successfully generated thumbnail with ${service.name}`);
           return {
@@ -68,7 +55,44 @@ export class EnhancedImageGenerationService {
             serviceName: service.name
           };
         } else {
-          console.log(`❌ ${service.name} generated invalid image`);
+          // For other services, check availability first
+          const isAvailable = await Promise.race([
+            service.isAvailable(),
+            new Promise<boolean>((_, reject) => 
+              setTimeout(() => reject(new Error('Availability check timeout')), 10000)
+            )
+          ]);
+          
+          if (!isAvailable) {
+            console.log(`⚠️ ${service.name} not available, skipping...`);
+            continue;
+          }
+
+          console.log(`✅ ${service.name} is available, generating image...`);
+          
+          const imageUrl = await Promise.race([
+            service.generate(prompt, style),
+            new Promise<string>((_, reject) => 
+              setTimeout(() => reject(new Error('Generation timeout')), 30000)
+            )
+          ]);
+          
+          console.log(`🎯 ${service.name} generated URL:`, imageUrl);
+          
+          // Validate the generated image for non-HF services
+          const isValid = await this.validateImage(imageUrl);
+          if (isValid) {
+            onStatusUpdate?.(`✅ Successfully generated with ${service.name}!`);
+            console.log(`🎉 Successfully generated thumbnail with ${service.name}`);
+            return {
+              success: true,
+              imageUrl,
+              method: 'ai-service',
+              serviceName: service.name
+            };
+          } else {
+            console.log(`❌ ${service.name} generated invalid image`);
+          }
         }
       } catch (error) {
         console.warn(`❌ ${service.name} failed:`, error);
@@ -119,7 +143,7 @@ export class EnhancedImageGenerationService {
       setTimeout(() => {
         console.log('⏰ Image validation timeout');
         resolve(false);
-      }, 10000);
+      }, 15000); // Reduced timeout
     });
   }
 

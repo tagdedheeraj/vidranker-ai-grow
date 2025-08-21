@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Image, Download, Share2, Sparkles, Save, RefreshCw, Palette, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { saveContent } from "@/utils/localStorage";
+import { generateWithHuggingFace, generateFallbackImage } from "@/services/imageGeneration";
 
 const ThumbnailGenerator = () => {
   const [prompt, setPrompt] = useState("");
@@ -22,139 +23,13 @@ const ThumbnailGenerator = () => {
     { id: "digital-art", name: "Digital Art", description: "Artistic style" },
   ];
 
-  const fallbackImages = [
-    `https://picsum.photos/1024/576?random=1&blur=0`,
-    `https://source.unsplash.com/1024x576/?thumbnail,youtube`,
-    `https://via.placeholder.com/1024x576/ff6b35/ffffff?text=Sample+Thumbnail`,
-    `https://dummyimage.com/1024x576/4f46e5/ffffff&text=YouTube+Thumbnail`,
-  ];
-
-  const generateWithHuggingFace = async (enhancedPrompt: string): Promise<string> => {
-    console.log("🚀 Starting Hugging Face API call...");
-    setDebugInfo("Connecting to Hugging Face API...");
-    
-    const API_KEY = "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";
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-    try {
-      console.log("📝 Enhanced prompt:", enhancedPrompt);
-      setDebugInfo("Generating image with AI...");
-
-      const response = await fetch(
-        "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
-        {
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify({
-            inputs: enhancedPrompt,
-            parameters: {
-              width: 1024,
-              height: 576,
-              num_inference_steps: 20,
-              guidance_scale: 7.5,
-            },
-          }),
-          signal: controller.signal,
-        }
-      );
-
-      clearTimeout(timeoutId);
-
-      console.log("🔍 Response status:", response.status);
-      console.log("🔍 Response headers:", Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("❌ API Error Response:", errorText);
-        
-        let errorMessage = `HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error || errorData.message || errorMessage;
-        } catch (e) {
-          errorMessage = errorText || errorMessage;
-        }
-        
-        throw new Error(`API Error: ${errorMessage}`);
-      }
-
-      const contentType = response.headers.get("content-type");
-      console.log("📄 Content type:", contentType);
-
-      if (!contentType?.includes("image")) {
-        const responseText = await response.text();
-        console.error("❌ Unexpected response type:", responseText);
-        throw new Error("Invalid response format from API");
-      }
-
-      const blob = await response.blob();
-      console.log("✅ Image blob received, size:", blob.size);
-      
-      if (blob.size === 0) {
-        throw new Error("Empty image received from API");
-      }
-
-      const imageUrl = URL.createObjectURL(blob);
-      console.log("✅ Hugging Face generation successful");
-      setDebugInfo("✅ AI generation completed");
-      
-      return imageUrl;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error("❌ Hugging Face API error:", error);
-      
-      if (error.name === 'AbortError') {
-        throw new Error("Request timed out - API took too long to respond");
-      }
-      
-      throw error;
-    }
-  };
-
-  const generateWithFallback = async (): Promise<string> => {
-    console.log("🔄 Using fallback image generation...");
-    setDebugInfo("Using backup image service...");
-    
-    // Try multiple fallback services
-    for (let i = 0; i < fallbackImages.length; i++) {
-      try {
-        const fallbackUrl = `${fallbackImages[i]}&t=${Date.now()}`;
-        console.log(`🔄 Trying fallback ${i + 1}:`, fallbackUrl);
-        
-        // Test if image loads
-        await new Promise((resolve, reject) => {
-          const img = new Image();
-          img.onload = resolve;
-          img.onerror = reject;
-          img.src = fallbackUrl;
-        });
-        
-        console.log(`✅ Fallback ${i + 1} successful`);
-        setDebugInfo(`✅ Backup image ${i + 1} loaded`);
-        return fallbackUrl;
-      } catch (error) {
-        console.log(`❌ Fallback ${i + 1} failed:`, error);
-        continue;
-      }
-    }
-    
-    // Last resort - simple placeholder
-    const lastResort = `data:image/svg+xml,${encodeURIComponent(`
-      <svg width="1024" height="576" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#4f46e5"/>
-        <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="48" fill="white" text-anchor="middle" dy="0.35em">
-          Sample Thumbnail
-        </text>
-      </svg>
-    `)}`;
-    
-    console.log("🆘 Using last resort placeholder");
-    setDebugInfo("✅ Generated placeholder thumbnail");
-    return lastResort;
+  const testImageLoad = (url: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error('Image failed to load'));
+      img.src = url;
+    });
   };
 
   const generateThumbnail = async () => {
@@ -175,7 +50,7 @@ const ThumbnailGenerator = () => {
       
       try {
         // Try Hugging Face API first
-        imageUrl = await generateWithHuggingFace(enhancedPrompt);
+        imageUrl = await generateWithHuggingFace(enhancedPrompt, setDebugInfo);
         toast.success("🎨 AI thumbnail generated successfully!");
       } catch (apiError) {
         console.log("🔄 API failed, using fallback...");
@@ -187,7 +62,7 @@ const ThumbnailGenerator = () => {
         setDebugInfo(`API Error: ${errorMessage}`);
         
         // Use fallback
-        imageUrl = await generateWithFallback();
+        imageUrl = await generateFallbackImage(setDebugInfo);
         toast.success("📷 Sample thumbnail generated!");
       }
       

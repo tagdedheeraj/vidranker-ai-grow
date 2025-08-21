@@ -5,8 +5,9 @@ export interface AIImageService {
   isAvailable: () => Promise<boolean>;
 }
 
-// Updated Hugging Face API key with write permissions
-const HUGGINGFACE_API_KEY = "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";
+// You need to replace this with your own valid Hugging Face API key
+// Get it from: https://huggingface.co/settings/tokens
+const HUGGINGFACE_API_KEY = "YOUR_HUGGING_FACE_API_KEY_HERE";
 
 export class HuggingFaceService implements AIImageService {
   name = 'Hugging Face';
@@ -19,6 +20,12 @@ export class HuggingFaceService implements AIImageService {
 
   async isAvailable(): Promise<boolean> {
     console.log('🔍 Testing API key availability with multiple models...');
+    
+    // Check if API key is properly set
+    if (!this.apiKey || this.apiKey === "YOUR_HUGGING_FACE_API_KEY_HERE") {
+      console.log('❌ No valid API key provided');
+      return false;
+    }
     
     for (const model of this.models) {
       try {
@@ -60,6 +67,11 @@ export class HuggingFaceService implements AIImageService {
   }
 
   async generate(prompt: string, style: string): Promise<string> {
+    // Check if API key is set
+    if (!this.apiKey || this.apiKey === "YOUR_HUGGING_FACE_API_KEY_HERE") {
+      throw new Error('Please set your Hugging Face API key. Get it from: https://huggingface.co/settings/tokens');
+    }
+
     const styleMap = {
       'photorealistic': 'photorealistic, high quality, professional photography, realistic, detailed',
       'cartoon': 'cartoon style, animated, colorful, fun, illustration, cartoon art',
@@ -128,7 +140,7 @@ export class HuggingFaceService implements AIImageService {
           }
         } else if (response.status === 401 || response.status === 403) {
           console.log(`🔑 Authentication failed for model ${model}, trying next...`);
-          lastError = new Error(`Access denied for model ${model}. Your API key may need permissions for this model.`);
+          lastError = new Error(`Access denied for model ${model}. Your API key may be invalid or expired.`);
           continue;
         } else {
           const errorText = await response.text().catch(() => 'Unknown error');
@@ -151,6 +163,6 @@ export class HuggingFaceService implements AIImageService {
     
     // All models failed
     console.error('❌ All Hugging Face models failed');
-    throw lastError || new Error('All available models failed to generate image. Please check your API key permissions.');
+    throw lastError || new Error('All available models failed to generate image. Please check your API key.');
   }
 }

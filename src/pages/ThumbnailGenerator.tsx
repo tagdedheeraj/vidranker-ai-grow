@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { saveContent } from "@/utils/localStorage";
 import { EnhancedImageGenerationService } from "@/services/enhancedImageGeneration";
 import { ThumbnailGenerationStatus } from "@/components/ThumbnailGenerationStatus";
+import { ApiKeyStatus } from "@/components/ApiKeyStatus";
 
 const ThumbnailGenerator = () => {
   const [prompt, setPrompt] = useState("");
@@ -15,6 +16,7 @@ const ThumbnailGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("photorealistic");
   const [generationStatus, setGenerationStatus] = useState<string>("");
+  const [generationMethod, setGenerationMethod] = useState<'ai-service' | 'canvas' | null>(null);
 
   const styles = [
     { id: "photorealistic", name: "Photorealistic", description: "Realistic photos" },
@@ -31,6 +33,7 @@ const ThumbnailGenerator = () => {
 
     setIsGenerating(true);
     setGenerationStatus("🚀 Initializing AI/ML API generation...");
+    setGenerationMethod(null);
     
     try {
       console.log("🎯 Starting AI/ML API thumbnail generation...");
@@ -46,12 +49,17 @@ const ThumbnailGenerator = () => {
       
       if (result.success && result.imageUrl) {
         setGeneratedImage(result.imageUrl);
+        setGenerationMethod(result.method);
         
-        const successMessage = "🤖 AI thumbnail generated successfully with AI/ML API!";
-        const methodInfo = "✅ Generated using AI/ML API high-quality models";
-        
-        toast.success(successMessage);
-        setGenerationStatus(methodInfo);
+        if (result.method === 'ai-service') {
+          const successMessage = "🤖 AI thumbnail generated successfully with AI/ML API!";
+          toast.success(successMessage);
+          setGenerationStatus("✅ AI thumbnail generated successfully!");
+        } else {
+          const fallbackMessage = "📝 Canvas thumbnail generated (AI service unavailable)";
+          toast.success(fallbackMessage);
+          setGenerationStatus("✅ Canvas thumbnail generated successfully!");
+        }
         
         // Auto-save to history
         try {
@@ -62,8 +70,8 @@ const ThumbnailGenerator = () => {
               prompt, 
               imageUrl: result.imageUrl, 
               style: selectedStyle,
-              method: 'ai-service',
-              serviceName: 'AI/ML API' 
+              method: result.method,
+              serviceName: result.serviceName 
             }
           });
           console.log("💾 Thumbnail saved to history");
@@ -71,7 +79,7 @@ const ThumbnailGenerator = () => {
           console.error("❌ Error saving thumbnail:", saveError);
         }
       } else {
-        throw new Error(result.error || "AI/ML API generation failed");
+        throw new Error(result.error || "Generation failed");
       }
       
     } catch (error) {
@@ -107,8 +115,8 @@ const ThumbnailGenerator = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'My Hugging Face AI Thumbnail',
-          text: 'Check out my AI-generated YouTube thumbnail created with Hugging Face!',
+          title: 'My AI Thumbnail',
+          text: 'Check out my AI-generated YouTube thumbnail!',
           url: generatedImage
         });
       } catch (error) {
@@ -151,6 +159,9 @@ const ThumbnailGenerator = () => {
           Create eye-catching thumbnails using AI/ML API
         </p>
       </div>
+
+      {/* API Key Status */}
+      <ApiKeyStatus />
 
       {/* Generation Status */}
       <ThumbnailGenerationStatus 
@@ -247,9 +258,9 @@ const ThumbnailGenerator = () => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Image className="w-5 h-5 text-success" />
-                Your AI Generated Thumbnail
+                Your Generated Thumbnail
                 <Badge variant="secondary" className="ml-2">
-                  AI/ML API
+                  {generationMethod === 'ai-service' ? 'AI/ML API' : 'Canvas Fallback'}
                 </Badge>
               </CardTitle>
               <Button onClick={saveToHistory} variant="outline" size="sm">
@@ -262,7 +273,7 @@ const ThumbnailGenerator = () => {
             <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
               <img
                 src={generatedImage}
-                alt="AI Generated thumbnail"
+                alt="Generated thumbnail"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   console.error("Image display error:", e);

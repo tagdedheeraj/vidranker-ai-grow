@@ -17,37 +17,41 @@ export class AimlApiService implements AIImageService {
   async isAvailable(): Promise<boolean> {
     console.log('🔍 Testing AI/ML API availability...');
     
-    // Check if API key is properly set
     if (!this.apiKey) {
       console.log('❌ No AI/ML API key provided');
       return false;
     }
     
     try {
-      // Test API with a simple request
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      // Test with image generation endpoint directly
+      const response = await fetch(`${this.baseUrl}/images/generations`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [{ role: 'user', content: 'test' }],
-          max_tokens: 1
+          model: 'flux-pro',
+          prompt: 'test image',
+          n: 1,
+          size: '1024x576',
+          quality: 'hd'
         })
       });
       
       console.log(`🔍 AI/ML API test response:`, response.status);
       
-      // Accept both 200 and some error codes that indicate API is working
-      if (response.status === 200 || response.status === 400 || response.status === 429) {
+      if (response.status === 200) {
         console.log('✅ AI/ML API is available');
         return true;
       }
       
-      if (response.status === 401 || response.status === 403) {
-        console.log('❌ AI/ML API authentication failed');
+      // Check for specific error messages
+      const errorData = await response.json().catch(() => ({}));
+      console.log('API Error Response:', errorData);
+      
+      if (response.status === 403 && errorData.message?.includes('verification')) {
+        console.log('❌ AI/ML API requires billing verification');
         return false;
       }
       
@@ -59,7 +63,6 @@ export class AimlApiService implements AIImageService {
   }
 
   async generate(prompt: string, style: string): Promise<string> {
-    // Check if API key is set
     if (!this.apiKey) {
       throw new Error('AI/ML API key is not configured');
     }
@@ -78,7 +81,7 @@ export class AimlApiService implements AIImageService {
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
 
       const response = await fetch(`${this.baseUrl}/images/generations`, {
         method: 'POST',
@@ -111,13 +114,17 @@ export class AimlApiService implements AIImageService {
         } else {
           throw new Error('Invalid response format from AI/ML API');
         }
+      } else if (response.status === 403) {
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.message?.includes('verification')) {
+          throw new Error('❌ AI/ML API Key requires billing verification. Please visit https://aimlapi.com/app/billing/verification to complete verification.');
+        }
+        throw new Error('Authentication failed. Please check your AI/ML API key.');
       } else if (response.status === 429) {
         throw new Error('Rate limit exceeded. Please try again in a moment.');
-      } else if (response.status === 401 || response.status === 403) {
-        throw new Error('Authentication failed. Please check your AI/ML API key.');
       } else {
         const errorData = await response.json().catch(() => ({}));
-        const errorMessage = errorData.error?.message || `HTTP ${response.status}`;
+        const errorMessage = errorData.error?.message || errorData.message || `HTTP ${response.status}`;
         throw new Error(`AI/ML API error: ${errorMessage}`);
       }
       

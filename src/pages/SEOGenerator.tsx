@@ -116,12 +116,12 @@ const SEOGenerator = () => {
             {isGenerating ? (
               <>
                 <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                AI is Creating Amazing Content for 2025...
+                AI is Creating Amazing Content...
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 mr-2" />
-                Generate AI SEO Content for 2025
+                Generate AI SEO Content
               </>
             )}
           </Button>

@@ -1,7 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Image, Clock, Bell, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const ThumbnailGenerator = () => {
   return (
@@ -53,13 +52,6 @@ const ThumbnailGenerator = () => {
               अभी के लिए आप हमारे SEO Generator का उपयोग कर सकते हैं।
             </p>
           </div>
-
-          <Button 
-            onClick={() => window.location.href = '/seo'} 
-            className="bg-gradient-primary hover:opacity-90 text-white"
-          >
-            Try SEO Generator Instead
-          </Button>
         </CardContent>
       </Card>
     </div>

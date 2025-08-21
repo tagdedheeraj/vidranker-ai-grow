@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Image, Download, Share2, Sparkles, Save, RefreshCw, Palette, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { saveContent } from "@/utils/localStorage";
-import { generateWithHuggingFace, generateFallbackImage } from "@/services/imageGeneration";
+import { ImageGenerationService } from "@/services/imageGeneration";
 
 const ThumbnailGenerator = () => {
   const [prompt, setPrompt] = useState("");
@@ -23,15 +23,6 @@ const ThumbnailGenerator = () => {
     { id: "digital-art", name: "Digital Art", description: "Artistic style" },
   ];
 
-  const testImageLoad = (url: string): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const img = document.createElement('img');
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error('Image failed to load'));
-      img.src = url;
-    });
-  };
-
   const generateThumbnail = async () => {
     if (!prompt.trim()) {
       toast.error("Please enter a thumbnail description");
@@ -44,46 +35,47 @@ const ThumbnailGenerator = () => {
     try {
       console.log("🎯 Starting thumbnail generation process...");
       
-      const enhancedPrompt = `YouTube thumbnail, ${selectedStyle} style, ${prompt}, bright colors, high contrast, eye-catching, professional quality, 16:9 aspect ratio, clickbait style, bold text overlay space, dramatic lighting`;
+      const result = await ImageGenerationService.generateImage(prompt, selectedStyle);
       
-      let imageUrl: string;
-      
-      try {
-        // Try Hugging Face API first
-        imageUrl = await generateWithHuggingFace(enhancedPrompt, setDebugInfo);
-        toast.success("🎨 AI thumbnail generated successfully!");
-      } catch (apiError) {
-        console.log("🔄 API failed, using fallback...");
-        console.error("API Error:", apiError);
+      if (result.success && result.imageUrl) {
+        setGeneratedImage(result.imageUrl);
         
-        // Show specific error message
-        const errorMessage = apiError instanceof Error ? apiError.message : "Unknown API error";
-        toast.error(`AI service unavailable: ${errorMessage}`);
-        setDebugInfo(`API Error: ${errorMessage}`);
+        // Show appropriate success message based on generation method
+        switch (result.method) {
+          case 'huggingface':
+            toast.success("🎨 AI thumbnail generated successfully!");
+            setDebugInfo("✅ Generated using AI model");
+            break;
+          case 'fallback':
+            toast.success("📷 Sample thumbnail generated!");
+            setDebugInfo("⚡ Generated using fallback service");
+            break;
+          case 'placeholder':
+            toast.success("🖼️ Placeholder thumbnail created!");
+            setDebugInfo("🎨 Generated placeholder thumbnail");
+            break;
+        }
         
-        // Use fallback
-        imageUrl = await generateFallbackImage(setDebugInfo);
-        toast.success("📷 Sample thumbnail generated!");
-      }
-      
-      setGeneratedImage(imageUrl);
-      
-      // Auto-save to history
-      try {
-        const savedItem = saveContent({
-          type: 'thumbnail',
-          title: `Thumbnail: ${prompt.substring(0, 30)}...`,
-          content: { prompt, imageUrl, style: selectedStyle }
-        });
-        console.log("💾 Thumbnail saved to history:", savedItem);
-      } catch (saveError) {
-        console.error("❌ Error saving thumbnail:", saveError);
+        // Auto-save to history
+        try {
+          saveContent({
+            type: 'thumbnail',
+            title: `Thumbnail: ${prompt.substring(0, 30)}...`,
+            content: { prompt, imageUrl: result.imageUrl, style: selectedStyle }
+          });
+          console.log("💾 Thumbnail saved to history");
+        } catch (saveError) {
+          console.error("❌ Error saving thumbnail:", saveError);
+        }
+      } else {
+        throw new Error(result.error || "Unknown generation error");
       }
       
     } catch (error) {
       console.error("❌ Complete generation failure:", error);
-      toast.error("Failed to generate thumbnail. Please try again.");
-      setDebugInfo("❌ Generation failed");
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to generate thumbnail: ${errorMessage}`);
+      setDebugInfo(`❌ Generation failed: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }

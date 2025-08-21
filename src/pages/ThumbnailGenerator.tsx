@@ -30,10 +30,10 @@ const ThumbnailGenerator = () => {
     }
 
     setIsGenerating(true);
-    setGenerationStatus("🚀 Initializing Hugging Face AI generation...");
+    setGenerationStatus("🚀 Initializing AI/ML API generation...");
     
     try {
-      console.log("🎯 Starting Hugging Face thumbnail generation...");
+      console.log("🎯 Starting AI/ML API thumbnail generation...");
       
       const result = await EnhancedImageGenerationService.generateImage(
         prompt, 
@@ -47,8 +47,8 @@ const ThumbnailGenerator = () => {
       if (result.success && result.imageUrl) {
         setGeneratedImage(result.imageUrl);
         
-        const successMessage = "🤖 AI thumbnail generated successfully with Hugging Face!";
-        const methodInfo = "✅ Generated using Hugging Face FLUX AI model";
+        const successMessage = "🤖 AI thumbnail generated successfully with AI/ML API!";
+        const methodInfo = "✅ Generated using AI/ML API high-quality models";
         
         toast.success(successMessage);
         setGenerationStatus(methodInfo);
@@ -63,7 +63,7 @@ const ThumbnailGenerator = () => {
               imageUrl: result.imageUrl, 
               style: selectedStyle,
               method: 'ai-service',
-              serviceName: 'Hugging Face' 
+              serviceName: 'AI/ML API' 
             }
           });
           console.log("💾 Thumbnail saved to history");
@@ -71,7 +71,7 @@ const ThumbnailGenerator = () => {
           console.error("❌ Error saving thumbnail:", saveError);
         }
       } else {
-        throw new Error(result.error || "Hugging Face generation failed");
+        throw new Error(result.error || "AI/ML API generation failed");
       }
       
     } catch (error) {
@@ -148,7 +148,7 @@ const ThumbnailGenerator = () => {
           AI Thumbnail Generator
         </h1>
         <p className="text-lg text-muted-foreground">
-          Create eye-catching thumbnails using Hugging Face AI
+          Create eye-catching thumbnails using AI/ML API
         </p>
       </div>
 
@@ -249,7 +249,7 @@ const ThumbnailGenerator = () => {
                 <Image className="w-5 h-5 text-success" />
                 Your AI Generated Thumbnail
                 <Badge variant="secondary" className="ml-2">
-                  Hugging Face AI
+                  AI/ML API
                 </Badge>
               </CardTitle>
               <Button onClick={saveToHistory} variant="outline" size="sm">

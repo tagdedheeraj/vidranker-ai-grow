@@ -23,7 +23,37 @@ export class AimlApiService implements AIImageService {
     }
     
     try {
-      // Test with image generation endpoint directly
+      // Use a lightweight models endpoint instead of actual generation
+      const response = await fetch(`${this.baseUrl}/models`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      console.log(`🔍 AI/ML API models endpoint response:`, response.status);
+      
+      if (response.status === 200) {
+        console.log('✅ AI/ML API is available');
+        return true;
+      }
+      
+      // If models endpoint fails, try a simple generation test
+      if (response.status === 404) {
+        console.log('🔄 Models endpoint not found, trying generation test...');
+        return await this.testGeneration();
+      }
+      
+      return false;
+    } catch (error) {
+      console.log('❌ Error testing AI/ML API:', error);
+      return await this.testGeneration();
+    }
+  }
+
+  private async testGeneration(): Promise<boolean> {
+    try {
       const response = await fetch(`${this.baseUrl}/images/generations`, {
         method: 'POST',
         headers: {
@@ -32,32 +62,14 @@ export class AimlApiService implements AIImageService {
         },
         body: JSON.stringify({
           model: 'flux-pro',
-          prompt: 'test image',
+          prompt: 'test',
           n: 1,
-          size: '1024x576',
-          quality: 'hd'
+          size: '512x512'
         })
       });
       
-      console.log(`🔍 AI/ML API test response:`, response.status);
-      
-      if (response.status === 200) {
-        console.log('✅ AI/ML API is available');
-        return true;
-      }
-      
-      // Check for specific error messages
-      const errorData = await response.json().catch(() => ({}));
-      console.log('API Error Response:', errorData);
-      
-      if (response.status === 403 && errorData.message?.includes('verification')) {
-        console.log('❌ AI/ML API requires billing verification');
-        return false;
-      }
-      
-      return false;
-    } catch (error) {
-      console.log('❌ Error testing AI/ML API:', error);
+      return response.status === 200;
+    } catch {
       return false;
     }
   }
@@ -68,20 +80,33 @@ export class AimlApiService implements AIImageService {
     }
 
     const styleMap = {
-      'photorealistic': 'photorealistic, high quality, professional photography, realistic, detailed, sharp focus',
-      'cartoon': 'cartoon style, animated, colorful, fun, illustration, cartoon art, vibrant colors',
-      'cinematic': 'cinematic lighting, dramatic, movie-style, professional, cinematic quality, film grain',
-      'digital-art': 'digital art, artistic, creative design, modern, digital painting, stylized'
+      'photorealistic': 'photorealistic, high quality, professional photography, realistic, detailed, sharp focus, 8K resolution',
+      'cartoon': 'cartoon style, animated, colorful, fun, illustration, cartoon art, vibrant colors, Disney style',
+      'cinematic': 'cinematic lighting, dramatic, movie-style, professional, cinematic quality, film grain, epic',
+      'digital-art': 'digital art, artistic, creative design, modern, digital painting, stylized, concept art'
     };
 
     const stylePrompt = styleMap[style as keyof typeof styleMap] || styleMap.photorealistic;
-    const enhancedPrompt = `YouTube thumbnail: ${prompt}, ${stylePrompt}, bright vibrant colors, high contrast, eye-catching design, professional quality, 16:9 aspect ratio, bold composition, attention-grabbing, trending thumbnail style, masterpiece, best quality`;
+    const enhancedPrompt = `YouTube thumbnail masterpiece: ${prompt}, ${stylePrompt}, bright vibrant colors, high contrast, eye-catching design, professional quality, 16:9 aspect ratio, bold composition, attention-grabbing, trending thumbnail style, no text, clean design, premium quality`;
     
     console.log('🎨 Generating with AI/ML API enhanced prompt:', enhancedPrompt);
     
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+      const requestBody = {
+        model: 'flux-pro',
+        prompt: enhancedPrompt,
+        n: 1,
+        size: '1024x576',
+        quality: 'hd',
+        response_format: 'url',
+        guidance_scale: 7.5,
+        num_inference_steps: 20
+      };
+
+      console.log('📤 Sending request to AI/ML API:', requestBody);
 
       const response = await fetch(`${this.baseUrl}/images/generations`, {
         method: 'POST',
@@ -89,33 +114,45 @@ export class AimlApiService implements AIImageService {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'flux-pro',
-          prompt: enhancedPrompt,
-          n: 1,
-          size: '1024x576',
-          quality: 'hd',
-          response_format: 'url'
-        }),
+        body: JSON.stringify(requestBody),
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-      console.log('🔍 AI/ML API response status:', response.status);
+      console.log('📥 AI/ML API response status:', response.status);
+
+      const responseText = await response.text();
+      console.log('📄 AI/ML API raw response:', responseText);
 
       if (response.status === 200) {
-        const data = await response.json();
-        console.log('✅ Successfully received response from AI/ML API');
+        let data;
+        try {
+          data = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error('❌ Failed to parse response JSON:', parseError);
+          throw new Error('Invalid response format from AI/ML API');
+        }
+        
+        console.log('✅ Successfully received response from AI/ML API:', data);
         
         if (data.data && data.data[0] && data.data[0].url) {
           const imageUrl = data.data[0].url;
-          console.log('🎉 Success with AI/ML API');
+          console.log('🎉 Success with AI/ML API, image URL:', imageUrl);
           return imageUrl;
+        } else if (data.url) {
+          console.log('🎉 Success with AI/ML API, direct URL:', data.url);
+          return data.url;
         } else {
+          console.error('❌ Invalid response structure:', data);
           throw new Error('Invalid response format from AI/ML API');
         }
       } else if (response.status === 403) {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch {
+          errorData = {};
+        }
         if (errorData.message?.includes('verification')) {
           throw new Error('❌ AI/ML API Key requires billing verification. Please visit https://aimlapi.com/app/billing/verification to complete verification.');
         }
@@ -123,8 +160,14 @@ export class AimlApiService implements AIImageService {
       } else if (response.status === 429) {
         throw new Error('Rate limit exceeded. Please try again in a moment.');
       } else {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch {
+          errorData = { message: responseText };
+        }
         const errorMessage = errorData.error?.message || errorData.message || `HTTP ${response.status}`;
+        console.error('❌ AI/ML API error:', errorMessage);
         throw new Error(`AI/ML API error: ${errorMessage}`);
       }
       

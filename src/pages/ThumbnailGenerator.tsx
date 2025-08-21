@@ -16,7 +16,7 @@ const ThumbnailGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("photorealistic");
   const [generationStatus, setGenerationStatus] = useState<string>("");
-  const [generationMethod, setGenerationMethod] = useState<'ai-service' | 'canvas' | 'placeholder' | null>(null);
+  const [generationMethod, setGenerationMethod] = useState<'ai-service' | 'prodia-service' | 'canvas' | 'placeholder' | null>(null);
 
   const styles = [
     { id: "photorealistic", name: "Photorealistic", description: "Realistic photos" },
@@ -32,11 +32,11 @@ const ThumbnailGenerator = () => {
     }
 
     setIsGenerating(true);
-    setGenerationStatus("🚀 Initializing AI/ML API generation...");
+    setGenerationStatus("🚀 Initializing multi-service AI generation...");
     setGenerationMethod(null);
     
     try {
-      console.log("🎯 Starting AI/ML API thumbnail generation...");
+      console.log("🎯 Starting enhanced multi-service thumbnail generation...");
       
       const result = await EnhancedImageGenerationService.generateImage(
         prompt, 
@@ -51,15 +51,17 @@ const ThumbnailGenerator = () => {
         setGeneratedImage(result.imageUrl);
         setGenerationMethod(result.method);
         
+        let successMessage = "";
         if (result.method === 'ai-service') {
-          const successMessage = "🤖 AI thumbnail generated successfully with AI/ML API!";
-          toast.success(successMessage);
-          setGenerationStatus("✅ AI thumbnail generated successfully!");
+          successMessage = "🤖 High-quality AI thumbnail generated with AI/ML API!";
+        } else if (result.method === 'prodia-service') {
+          successMessage = "🎨 AI thumbnail generated with Prodia API!";
         } else {
-          const fallbackMessage = "📝 Canvas thumbnail generated (AI service unavailable)";
-          toast.success(fallbackMessage);
-          setGenerationStatus("✅ Canvas thumbnail generated successfully!");
+          successMessage = "🖼️ Custom designed thumbnail created with Enhanced Canvas!";
         }
+        
+        toast.success(successMessage);
+        setGenerationStatus("✅ Thumbnail generated successfully!");
         
         // Auto-save to history
         try {
@@ -149,6 +151,19 @@ const ThumbnailGenerator = () => {
     }
   };
 
+  const getMethodBadgeInfo = () => {
+    switch (generationMethod) {
+      case 'ai-service':
+        return { text: 'AI/ML API • Premium Quality', color: 'bg-green-500' };
+      case 'prodia-service':
+        return { text: 'Prodia API • AI Generated', color: 'bg-blue-500' };
+      case 'canvas':
+        return { text: 'Enhanced Canvas • Custom Design', color: 'bg-purple-500' };
+      default:
+        return { text: 'Generated', color: 'bg-gray-500' };
+    }
+  };
+
   return (
     <div className="space-y-6 pb-20 md:pb-8">
       <div className="text-center">
@@ -156,7 +171,7 @@ const ThumbnailGenerator = () => {
           AI Thumbnail Generator
         </h1>
         <p className="text-lg text-muted-foreground">
-          Create eye-catching thumbnails using AI/ML API
+          Create eye-catching thumbnails using multiple AI services
         </p>
       </div>
 
@@ -208,7 +223,7 @@ const ThumbnailGenerator = () => {
             Describe Your Thumbnail
           </CardTitle>
           <CardDescription>
-            Be specific about colors, objects, people, and emotions you want in your AI thumbnail
+            Be specific about colors, objects, people, and emotions you want in your thumbnail
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -242,7 +257,7 @@ const ThumbnailGenerator = () => {
                 disabled={isGenerating}
                 variant="outline"
                 className="px-6"
-                title="Generate new AI version"
+                title="Generate new version"
               >
                 <RefreshCw className="w-5 h-5" />
               </Button>
@@ -259,8 +274,8 @@ const ThumbnailGenerator = () => {
               <CardTitle className="flex items-center gap-2">
                 <Image className="w-5 h-5 text-success" />
                 Your Generated Thumbnail
-                <Badge variant="secondary" className="ml-2">
-                  {generationMethod === 'ai-service' ? 'AI/ML API' : 'Canvas Fallback'}
+                <Badge variant="secondary" className={`ml-2 text-white ${getMethodBadgeInfo().color}`}>
+                  {getMethodBadgeInfo().text}
                 </Badge>
               </CardTitle>
               <Button onClick={saveToHistory} variant="outline" size="sm">

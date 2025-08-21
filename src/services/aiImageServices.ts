@@ -138,7 +138,6 @@ export class HuggingFaceService implements AIImageService {
         }
         
       } catch (error) {
-        clearTimeout(timeoutId);
         console.error(`❌ Error with model ${model}:`, error);
         
         if (error instanceof Error && error.name === 'AbortError') {

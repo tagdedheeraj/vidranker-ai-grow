@@ -7,7 +7,8 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     url: 'https://4915bcda-5df4-4f5d-8f4f-54a36dbac309.lovableproject.com?forceHideBadge=true',
-    cleartext: true
+    cleartext: true,
+    androidScheme: 'https'
   },
   plugins: {
     SplashScreen: {
@@ -23,10 +24,18 @@ const config: CapacitorConfig = {
       applicationId: 'ca-app-pub-2211398170597117~9683407494',
       initializeForTesting: false, // Live ads enabled
       testDeviceIds: [], // Empty for production
+      tagForChildDirectedTreatment: false,
+      tagForUnderAgeOfConsent: false,
+      maxAdContentRating: 'MA'
     },
+    CapacitorHttp: {
+      enabled: true
+    }
   },
   android: {
     allowMixedContent: true,
+    captureInput: true,
+    webContentsDebuggingEnabled: false
   },
   ios: {
     contentInset: 'automatic',

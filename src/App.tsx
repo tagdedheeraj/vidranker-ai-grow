@@ -32,51 +32,73 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("App starting - VidRanker v1.0");
+        console.log("App starting safely - VidRanker v1.0");
         console.log("Platform:", Capacitor.getPlatform());
         console.log("Is native platform:", Capacitor.isNativePlatform());
         
         if (Capacitor.isNativePlatform()) {
-          console.log("Native platform detected - initializing AdMob...");
+          console.log("Native platform detected - initializing AdMob with crash protection...");
           
-          // Initialize AdMob with enhanced error handling
+          // Safe AdMob initialization with enhanced error handling
           setTimeout(async () => {
             try {
-              await adMobService.initialize();
-              console.log("AdMob initialization process completed");
-              
-              // Show banner after successful initialization
-              setTimeout(async () => {
-                try {
-                  if (adMobService.isReady()) {
-                    const bannerResult = await adMobService.showBanner();
-                    console.log("Banner ad result:", bannerResult);
-                  } else {
-                    console.log("AdMob not ready - skipping banner");
+              // Check if service is still valid
+              if (adMobService && typeof adMobService.initialize === 'function') {
+                await adMobService.initialize();
+                console.log("AdMob initialization process completed safely");
+                
+                // Show banner after successful initialization with safety checks
+                setTimeout(async () => {
+                  try {
+                    if (adMobService && adMobService.isReady && adMobService.isReady()) {
+                      const bannerResult = await adMobService.showBanner();
+                      console.log("Banner ad result:", bannerResult);
+                    } else {
+                      console.log("AdMob not ready - skipping banner");
+                    }
+                  } catch (bannerError) {
+                    console.error("Banner display error (app continues safely):", bannerError);
                   }
-                } catch (bannerError) {
-                  console.error("Banner display error (app continues):", bannerError);
-                }
-              }, 2000);
+                }, 2000);
+              } else {
+                console.log("AdMob service not available - skipping initialization");
+              }
             } catch (initError) {
-              console.error("AdMob initialization error (app continues):", initError);
+              console.error("AdMob initialization error (app continues safely):", initError);
             }
           }, 4000); // Delayed initialization for stability
         } else {
           console.log("Web platform - AdMob disabled");
         }
         
-        // Log final status
+        // Log final status with safety checks
         setTimeout(() => {
-          const status = adMobService.getStatus();
-          console.log("Final AdMob status:", status);
+          try {
+            if (adMobService && typeof adMobService.getStatus === 'function') {
+              const status = adMobService.getStatus();
+              console.log("Final AdMob status:", status);
+            }
+          } catch (statusError) {
+            console.error("Error getting AdMob status (non-fatal):", statusError);
+          }
         }, 8000);
       } catch (error) {
-        console.error("App initialization error (non-fatal):", error);
+        console.error("App initialization error (app continues safely):", error);
       }
     };
 
     initializeApp();
+
+    // Cleanup function
+    return () => {
+      try {
+        if (adMobService && typeof adMobService.destroy === 'function') {
+          adMobService.destroy();
+        }
+      } catch (error) {
+        console.error("Cleanup error (non-fatal):", error);
+      }
+    };
   }, []);
 
   return (

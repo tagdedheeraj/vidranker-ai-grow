@@ -23,52 +23,77 @@ export class EnhancedImageGenerationService {
     onStatusUpdate?: (status: string) => void
   ): Promise<ImageGenerationResult> {
     
-    onStatusUpdate?.('🎨 Starting AI image generation...');
+    console.log('🚀 Starting enhanced image generation for prompt:', prompt);
+    onStatusUpdate?.('🎨 Starting AI thumbnail generation...');
     
-    // Try AI services in order
-    for (const service of this.aiServices) {
+    // Try AI services in order with better error handling
+    for (let i = 0; i < this.aiServices.length; i++) {
+      const service = this.aiServices[i];
       try {
-        onStatusUpdate?.(`🔄 Trying ${service.name}...`);
+        onStatusUpdate?.(`🔄 Trying ${service.name} (${i + 1}/${this.aiServices.length})...`);
+        console.log(`🔄 Attempting generation with ${service.name}`);
         
-        const isAvailable = await service.isAvailable();
+        const isAvailable = await Promise.race([
+          service.isAvailable(),
+          new Promise<boolean>((_, reject) => 
+            setTimeout(() => reject(new Error('Availability check timeout')), 10000)
+          )
+        ]);
+        
         if (!isAvailable) {
-          console.log(`${service.name} not available, skipping...`);
+          console.log(`⚠️ ${service.name} not available, skipping...`);
           continue;
         }
 
-        const imageUrl = await service.generate(prompt, style);
+        console.log(`✅ ${service.name} is available, generating image...`);
+        
+        const imageUrl = await Promise.race([
+          service.generate(prompt, style),
+          new Promise<string>((_, reject) => 
+            setTimeout(() => reject(new Error('Generation timeout')), 30000)
+          )
+        ]);
+        
+        console.log(`🎯 ${service.name} generated URL:`, imageUrl);
         
         // Validate the generated image
         const isValid = await this.validateImage(imageUrl);
         if (isValid) {
-          onStatusUpdate?.(`✅ Generated with ${service.name}`);
+          onStatusUpdate?.(`✅ Successfully generated with ${service.name}!`);
+          console.log(`🎉 Successfully generated thumbnail with ${service.name}`);
           return {
             success: true,
             imageUrl,
             method: 'ai-service',
             serviceName: service.name
           };
+        } else {
+          console.log(`❌ ${service.name} generated invalid image`);
         }
       } catch (error) {
-        console.warn(`${service.name} failed:`, error);
+        console.warn(`❌ ${service.name} failed:`, error);
+        onStatusUpdate?.(`⚠️ ${service.name} failed, trying next option...`);
         continue;
       }
     }
 
     // Fallback to canvas generation
-    onStatusUpdate?.('🎨 Creating custom thumbnail...');
+    console.log('🎨 All AI services failed, falling back to canvas generation');
+    onStatusUpdate?.('🎨 Creating custom thumbnail with canvas...');
     try {
       const canvasImage = CanvasImageGenerator.generateThumbnail(prompt, style);
+      console.log('✅ Canvas generation successful');
       return {
         success: true,
         imageUrl: canvasImage,
         method: 'canvas'
       };
     } catch (error) {
-      console.error('Canvas generation failed:', error);
+      console.error('❌ Canvas generation failed:', error);
     }
 
     // Final fallback to SVG placeholder
+    console.log('📝 Canvas failed, creating SVG placeholder');
     onStatusUpdate?.('📝 Creating text placeholder...');
     const placeholder = this.generateSVGPlaceholder(prompt);
     return {
@@ -82,17 +107,26 @@ export class EnhancedImageGenerationService {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
+      img.onload = () => {
+        console.log('✅ Image validation successful');
+        resolve(true);
+      };
+      img.onerror = (error) => {
+        console.log('❌ Image validation failed:', error);
+        resolve(false);
+      };
       img.src = url;
-      setTimeout(() => resolve(false), 5000);
+      setTimeout(() => {
+        console.log('⏰ Image validation timeout');
+        resolve(false);
+      }, 10000);
     });
   }
 
   private static generateSVGPlaceholder(prompt: string): string {
     const colors = ['#4f46e5', '#059669', '#dc2626', '#7c3aed', '#ea580c'];
     const color = colors[Math.floor(Math.random() * colors.length)];
-    const shortPrompt = prompt.substring(0, 20) + (prompt.length > 20 ? '...' : '');
+    const shortPrompt = prompt.substring(0, 25) + (prompt.length > 25 ? '...' : '');
     
     const svg = `
       <svg width="1024" height="576" xmlns="http://www.w3.org/2000/svg">
@@ -103,14 +137,17 @@ export class EnhancedImageGenerationService {
           </linearGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#grad)"/>
-        <circle cx="200" cy="200" r="80" fill="white" opacity="0.2"/>
-        <circle cx="800" cy="400" r="60" fill="white" opacity="0.3"/>
-        <rect x="100" y="450" width="824" height="80" rx="40" fill="rgba(0,0,0,0.7)"/>
-        <text x="512" y="490" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle">
+        <circle cx="150" cy="150" r="60" fill="white" opacity="0.2"/>
+        <circle cx="850" cy="400" r="80" fill="white" opacity="0.3"/>
+        <rect x="50" y="400" width="924" height="120" rx="60" fill="rgba(0,0,0,0.8)"/>
+        <text x="512" y="445" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle">
           ${shortPrompt}
         </text>
-        <text x="512" y="520" font-family="Arial, sans-serif" font-size="18" fill="white" text-anchor="middle">
+        <text x="512" y="475" font-family="Arial, sans-serif" font-size="16" fill="white" text-anchor="middle" opacity="0.9">
           VidRanker AI Thumbnail
+        </text>
+        <text x="512" y="500" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" opacity="0.7">
+          Generated for YouTube Success
         </text>
       </svg>
     `;

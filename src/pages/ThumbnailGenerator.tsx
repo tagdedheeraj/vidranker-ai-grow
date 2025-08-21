@@ -1,20 +1,21 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Image, Download, Share2, Sparkles, Save, RefreshCw, Palette, AlertCircle } from "lucide-react";
+import { Image, Download, Share2, Sparkles, Save, RefreshCw, Palette } from "lucide-react";
 import { toast } from "sonner";
 import { saveContent } from "@/utils/localStorage";
-import { ImageGenerationService } from "@/services/imageGeneration";
+import { EnhancedImageGenerationService } from "@/services/enhancedImageGeneration";
+import { ThumbnailGenerationStatus } from "@/components/ThumbnailGenerationStatus";
 
 const ThumbnailGenerator = () => {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("photorealistic");
-  const [debugInfo, setDebugInfo] = useState<string>("");
+  const [generationStatus, setGenerationStatus] = useState<string>("");
+  const [generationMethod, setGenerationMethod] = useState<string>("");
 
   const styles = [
     { id: "photorealistic", name: "Photorealistic", description: "Realistic photos" },
@@ -30,38 +31,58 @@ const ThumbnailGenerator = () => {
     }
 
     setIsGenerating(true);
-    setDebugInfo("Starting thumbnail generation...");
+    setGenerationStatus("🚀 Initializing thumbnail generation...");
     
     try {
-      console.log("🎯 Starting thumbnail generation process...");
+      console.log("🎯 Starting enhanced thumbnail generation...");
       
-      const result = await ImageGenerationService.generateImage(prompt, selectedStyle);
+      const result = await EnhancedImageGenerationService.generateImage(
+        prompt, 
+        selectedStyle,
+        (status) => {
+          setGenerationStatus(status);
+          console.log("Status update:", status);
+        }
+      );
       
       if (result.success && result.imageUrl) {
         setGeneratedImage(result.imageUrl);
         
         // Show appropriate success message based on generation method
+        let successMessage = "🎨 Thumbnail generated successfully!";
+        let methodInfo = "";
+        
         switch (result.method) {
-          case 'huggingface':
-            toast.success("🎨 AI thumbnail generated successfully!");
-            setDebugInfo("✅ Generated using AI model");
+          case 'ai-service':
+            successMessage = `🤖 AI thumbnail generated with ${result.serviceName}!`;
+            methodInfo = `✅ Generated using ${result.serviceName} AI model`;
             break;
-          case 'fallback':
-            toast.success("📷 Sample thumbnail generated!");
-            setDebugInfo("⚡ Generated using fallback service");
+          case 'canvas':
+            successMessage = "🎨 Custom thumbnail created!";
+            methodInfo = "🖼️ Generated using advanced canvas rendering";
             break;
           case 'placeholder':
-            toast.success("🖼️ Placeholder thumbnail created!");
-            setDebugInfo("🎨 Generated placeholder thumbnail");
+            successMessage = "📝 Text-based thumbnail created!";
+            methodInfo = "📋 Generated fallback placeholder";
             break;
         }
+        
+        toast.success(successMessage);
+        setGenerationStatus(methodInfo);
+        setGenerationMethod(result.method);
         
         // Auto-save to history
         try {
           saveContent({
             type: 'thumbnail',
             title: `Thumbnail: ${prompt.substring(0, 30)}...`,
-            content: { prompt, imageUrl: result.imageUrl, style: selectedStyle }
+            content: { 
+              prompt, 
+              imageUrl: result.imageUrl, 
+              style: selectedStyle,
+              method: result.method,
+              serviceName: result.serviceName 
+            }
           });
           console.log("💾 Thumbnail saved to history");
         } catch (saveError) {
@@ -75,7 +96,7 @@ const ThumbnailGenerator = () => {
       console.error("❌ Complete generation failure:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
       toast.error(`Failed to generate thumbnail: ${errorMessage}`);
-      setDebugInfo(`❌ Generation failed: ${errorMessage}`);
+      setGenerationStatus(`❌ Generation failed: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
@@ -149,17 +170,11 @@ const ThumbnailGenerator = () => {
         </p>
       </div>
 
-      {/* Debug Info Card */}
-      {debugInfo && (
-        <Card className="glass border-blue-200 bg-blue-50/50">
-          <CardContent className="pt-4">
-            <div className="flex items-center gap-2 text-sm text-blue-700">
-              <AlertCircle className="w-4 h-4" />
-              <span>{debugInfo}</span>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Generation Status */}
+      <ThumbnailGenerationStatus 
+        status={generationStatus} 
+        isGenerating={isGenerating} 
+      />
 
       {/* Style Selection */}
       <Card className="glass">
@@ -251,6 +266,12 @@ const ThumbnailGenerator = () => {
               <CardTitle className="flex items-center gap-2">
                 <Image className="w-5 h-5 text-success" />
                 Your Generated Thumbnail
+                {generationMethod && (
+                  <Badge variant="secondary" className="ml-2">
+                    {generationMethod === 'ai-service' ? 'AI Generated' : 
+                     generationMethod === 'canvas' ? 'Custom Generated' : 'Text Based'}
+                  </Badge>
+                )}
               </CardTitle>
               <Button onClick={saveToHistory} variant="outline" size="sm">
                 <Save className="w-4 h-4 mr-2" />

@@ -16,7 +16,7 @@ const ThumbnailGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("photorealistic");
   const [generationStatus, setGenerationStatus] = useState<string>("");
-  const [generationMethod, setGenerationMethod] = useState<'ai-service' | 'canvas' | null>(null);
+  const [generationMethod, setGenerationMethod] = useState<'ai-service' | 'canvas' | 'placeholder' | null>(null);
 
   const styles = [
     { id: "photorealistic", name: "Photorealistic", description: "Realistic photos" },
@@ -98,7 +98,7 @@ const ThumbnailGenerator = () => {
     try {
       const link = document.createElement('a');
       link.href = generatedImage;
-      link.download = `huggingface-thumbnail-${Date.now()}.jpg`;
+      link.download = `aimlapi-thumbnail-${Date.now()}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

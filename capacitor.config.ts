@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   appName: 'VidRanker',
   webDir: 'dist',
   server: {
-    url: 'https://4915bcda-5df4-4f5d-8f4f-54a36dbac309.lovableproject.com?forceHideBadge=true',
+    url: 'https://vidranker.space',
     cleartext: true,
     androidScheme: 'https'
   },
@@ -22,8 +22,8 @@ const config: CapacitorConfig = {
     },
     AdMob: {
       applicationId: 'ca-app-pub-2211398170597117~9683407494',
-      initializeForTesting: false, // Live ads enabled
-      testDeviceIds: [], // Empty for production
+      initializeForTesting: false,
+      testDeviceIds: [],
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
       maxAdContentRating: 'MA'
@@ -35,7 +35,7 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: false
+    webContentsDebuggingEnabled: true
   },
   ios: {
     contentInset: 'automatic',

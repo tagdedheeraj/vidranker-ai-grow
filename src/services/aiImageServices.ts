@@ -1,13 +1,15 @@
-
 export interface AIImageService {
   name: string;
   generate: (prompt: string, style: string) => Promise<string>;
   isAvailable: () => Promise<boolean>;
 }
 
+// Centralized API configuration
+const HUGGINGFACE_API_KEY = "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";
+
 export class HuggingFaceService implements AIImageService {
   name = 'Hugging Face';
-  private apiKey = "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";
+  private apiKey = HUGGINGFACE_API_KEY;
 
   async isAvailable(): Promise<boolean> {
     try {
@@ -40,7 +42,7 @@ export class HuggingFaceService implements AIImageService {
     console.log('🎨 Generating with prompt:', enhancedPrompt);
     
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 45000); // Increased timeout
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
 
     try {
       const response = await fetch(
@@ -57,7 +59,7 @@ export class HuggingFaceService implements AIImageService {
               width: 1024,
               height: 576,
               num_inference_steps: 4,
-              guidance_scale: 0.0, // FLUX.1-schnell works best with guidance_scale 0
+              guidance_scale: 0.0,
             },
           }),
           signal: controller.signal,

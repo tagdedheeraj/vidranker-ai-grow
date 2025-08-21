@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Copy, Search, Sparkles, CheckCircle, Save, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { saveContent } from "@/utils/localStorage";
+import { SEOGenerationService } from "@/services/seoGenerationService";
 
 const SEOGenerator = () => {
   const [keyword, setKeyword] = useState("");
@@ -27,86 +28,34 @@ const SEOGenerator = () => {
 
     setIsGenerating(true);
     
-    // Simulate AI generation with enhanced content
-    setTimeout(() => {
-      const sampleTags = [
-        `${keyword}`,
-        `${keyword} tutorial`,
-        `${keyword} guide`,
-        `${keyword} tips`,
-        `${keyword} 2024`,
-        `how to ${keyword}`,
-        `${keyword} for beginners`,
-        "youtube growth",
-        "content creator",
-        "viral video",
-        "youtube algorithm",
-        "video marketing",
-        "engagement boost",
-        "subscriber growth",
-        "youtube seo"
-      ];
-
-      const sampleHashtags = [
-        `#${keyword.replace(/\s+/g, '')}`,
-        "#YouTube",
-        "#ContentCreator",
-        "#Growth",
-        "#2024",
-        "#Tutorial",
-        "#Tips",
-        "#Viral",
-        "#Success",
-        "#Marketing"
-      ];
-
-      const sampleTitle = `${keyword} - Complete Guide for 2024 | Boost Your YouTube Growth 🚀`;
-      const sampleDescription = `🚀 Master ${keyword} with this comprehensive guide! Learn proven strategies to grow your YouTube channel, increase views, and boost engagement. Perfect for content creators looking to dominate in 2024.
-
-🔥 What you'll learn:
-• Advanced ${keyword} techniques
-• YouTube algorithm secrets
-• Content optimization strategies
-• Engagement boosting tips
-• Monetization methods
-
-📈 Transform your channel today! Don't forget to LIKE, SUBSCRIBE, and hit the BELL icon for more amazing content!
-
-⏰ Timestamps:
-00:00 Introduction
-02:30 Getting Started with ${keyword}
-05:45 Advanced Techniques
-10:20 Pro Tips & Tricks
-15:00 Conclusion
-
-${sampleHashtags.slice(0, 6).join(' ')}`;
-
-      const data = {
-        tags: sampleTags,
-        title: sampleTitle,
-        description: sampleDescription,
-        hashtags: sampleHashtags
-      };
-
+    try {
+      console.log("🎯 Starting real SEO generation with Hugging Face API...");
+      
+      const data = await SEOGenerationService.generateSEOContent(keyword);
+      
       setGeneratedData(data);
       
       // Auto-save to history
-      console.log("Saving SEO content to history...");
+      console.log("💾 Saving SEO content to history...");
       try {
         const savedItem = saveContent({
           type: 'seo',
           title: `SEO: ${keyword}`,
           content: data
         });
-        console.log("SEO content saved successfully:", savedItem);
-        toast.success("SEO content generated and saved to history!");
+        console.log("✅ SEO content saved successfully:", savedItem);
+        toast.success("🤖 SEO content generated with AI and saved to history!");
       } catch (error) {
-        console.error("Error saving SEO content:", error);
-        toast.success("SEO content generated!");
+        console.error("❌ Error saving SEO content:", error);
+        toast.success("🤖 SEO content generated with AI!");
       }
       
+    } catch (error) {
+      console.error("❌ SEO generation failed:", error);
+      toast.error("Failed to generate SEO content. Please try again.");
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const copyToClipboard = (text: string, type: string) => {
@@ -134,10 +83,10 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
     <div className="space-y-6 pb-20 md:pb-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-4 gradient-text">
-          SEO Content Generator
+          AI SEO Content Generator
         </h1>
         <p className="text-lg text-muted-foreground">
-          Enter your video topic and get optimized tags, titles, and descriptions
+          Enter your video topic and get AI-powered tags, titles, and descriptions
         </p>
       </div>
 
@@ -149,7 +98,7 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             Enter Your Video Topic
           </CardTitle>
           <CardDescription>
-            Describe your video content or enter main keywords
+            Describe your video content or enter main keywords for AI generation
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -167,12 +116,12 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             {isGenerating ? (
               <>
                 <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                Generating Amazing Content...
+                AI is Creating Amazing Content...
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5 mr-2" />
-                Generate SEO Content
+                Generate AI SEO Content
               </>
             )}
           </Button>
@@ -219,6 +168,7 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
+          {/* Hashtags */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -247,6 +197,7 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
+          {/* Title */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -269,6 +220,7 @@ ${sampleHashtags.slice(0, 6).join(' ')}`;
             </CardContent>
           </Card>
 
+          {/* Description */}
           <Card className="glass">
             <CardHeader>
               <div className="flex items-center justify-between">

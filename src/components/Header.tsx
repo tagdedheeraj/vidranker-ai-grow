@@ -23,7 +23,7 @@ const Header = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
           <img 
-            src="/lovable-uploads/c6b11630-2cf2-4348-836e-9ec57f17fd86.png" 
+            src="/lovable-uploads/cbaa2d06-fff2-4a37-953d-e7a7c19204f3.png" 
             alt="VidRanker Logo" 
             className="w-10 h-10 rounded-lg"
           />

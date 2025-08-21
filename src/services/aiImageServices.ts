@@ -6,7 +6,7 @@ export interface AIImageService {
 }
 
 // Updated Hugging Face API key with write permissions
-const HUGGINGFACE_API_KEY = "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";
+const HUGGINGFACE_API_KEY = "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";
 
 export class HuggingFaceService implements AIImageService {
   name = 'Hugging Face';

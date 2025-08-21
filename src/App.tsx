@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
+import { SplashScreen } from "@capacitor/splash-screen";
 import Header from "./components/Header";
 import BottomNavigation from "./components/BottomNavigation";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -32,41 +32,53 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("App starting safely - VidRanker v1.0");
+        console.log("VidRanker starting - Optimized loading v2.0");
         console.log("Platform:", Capacitor.getPlatform());
         console.log("Is native platform:", Capacitor.isNativePlatform());
         
+        // Hide splash screen after app is ready (faster loading)
         if (Capacitor.isNativePlatform()) {
-          console.log("Native platform detected - initializing AdMob with crash protection...");
+          setTimeout(async () => {
+            try {
+              await SplashScreen.hide();
+              console.log("Splash screen hidden - app ready");
+            } catch (error) {
+              console.error("Splash screen hide error (non-fatal):", error);
+            }
+          }, 2000);
+        }
+        
+        if (Capacitor.isNativePlatform()) {
+          console.log("Native platform detected - initializing AdMob for domain verification...");
           
-          // Safe AdMob initialization with enhanced error handling
+          // Optimized AdMob initialization for faster startup
           setTimeout(async () => {
             try {
               // Check if service is still valid
               if (adMobService && typeof adMobService.initialize === 'function') {
                 await adMobService.initialize();
-                console.log("AdMob initialization process completed safely");
+                console.log("AdMob initialization completed - ready for vidranker.space verification");
                 
-                // Show banner after successful initialization with safety checks
+                // Show banner after successful initialization (reduced delay)
                 setTimeout(async () => {
                   try {
                     if (adMobService && adMobService.isReady && adMobService.isReady()) {
                       const bannerResult = await adMobService.showBanner();
-                      console.log("Banner ad result:", bannerResult);
+                      console.log("Banner ad result for domain verification:", bannerResult);
                     } else {
                       console.log("AdMob not ready - skipping banner");
                     }
                   } catch (bannerError) {
                     console.error("Banner display error (app continues safely):", bannerError);
                   }
-                }, 2000);
+                }, 1500);
               } else {
                 console.log("AdMob service not available - skipping initialization");
               }
             } catch (initError) {
               console.error("AdMob initialization error (app continues safely):", initError);
             }
-          }, 4000); // Delayed initialization for stability
+          }, 2500); // Reduced initialization delay for faster startup
         } else {
           console.log("Web platform - AdMob disabled");
         }
@@ -76,12 +88,13 @@ const App = () => {
           try {
             if (adMobService && typeof adMobService.getStatus === 'function') {
               const status = adMobService.getStatus();
-              console.log("Final AdMob status:", status);
+              console.log("Final AdMob status for domain verification:", status);
+              console.log("Domain verification: Upload app-ads.txt to vidranker.space/app-ads.txt");
             }
           } catch (statusError) {
             console.error("Error getting AdMob status (non-fatal):", statusError);
           }
-        }, 8000);
+        }, 6000);
       } catch (error) {
         console.error("App initialization error (app continues safely):", error);
       }

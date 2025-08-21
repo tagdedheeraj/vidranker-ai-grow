@@ -42,10 +42,10 @@ class AdMobService {
     this.initializationAttempted = true;
 
     try {
-      console.log("AdMobService: Starting safe initialization...");
+      console.log("AdMobService: Starting optimized initialization...");
       
-      // Enhanced delay with safety checks
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      // Reduced delay for faster startup
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Check if service is still valid
       if (this.isDestroyed) {
@@ -59,16 +59,16 @@ class AdMobService {
         initializeForTesting: false, // Disabled for live ads
       });
 
-      // Add timeout to prevent hanging
+      // Reduced timeout for better performance
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('AdMob initialization timeout')), 10000)
+        setTimeout(() => reject(new Error('AdMob initialization timeout')), 8000)
       );
 
       await Promise.race([initPromise, timeoutPromise]);
 
       this.isInitialized = true;
       this.initializationFailed = false;
-      console.log("AdMobService: Initialized successfully with crash protection");
+      console.log("AdMobService: Initialized successfully - ready for vidranker.space domain verification");
     } catch (error) {
       console.error("AdMobService: Initialization failed (app continues safely):", error);
       this.isInitialized = false;
@@ -99,17 +99,17 @@ class AdMobService {
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: false // Live ads enabled
+        isTesting: false // Live ads enabled for domain verification
       };
 
-      // Safe banner display with timeout
+      // Safe banner display with reduced timeout
       const bannerPromise = AdMob.showBanner(bannerOptions);
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Banner timeout')), 8000)
+        setTimeout(() => reject(new Error('Banner timeout')), 6000)
       );
 
       await Promise.race([bannerPromise, timeoutPromise]);
-      console.log("AdMobService: Live banner ad displayed successfully");
+      console.log("AdMobService: Live banner ad displayed - domain verification active");
       return true;
     } catch (error) {
       console.error("AdMobService: Banner ad failed (app continues safely):", error);
@@ -134,14 +134,14 @@ class AdMobService {
         return false;
       }
 
-      // Safe interstitial preparation with timeout
+      // Safe interstitial preparation with reduced timeout
       const preparePromise = AdMob.prepareInterstitial({
         adId: 'ca-app-pub-2211398170597117/8371175883', // Your live interstitial ad unit
-        isTesting: false // Live ads enabled
+        isTesting: false // Live ads enabled for domain verification
       });
 
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Interstitial prepare timeout')), 8000)
+        setTimeout(() => reject(new Error('Interstitial prepare timeout')), 6000)
       );
 
       await Promise.race([preparePromise, timeoutPromise]);
@@ -152,7 +152,7 @@ class AdMobService {
       }
 
       await AdMob.showInterstitial();
-      console.log("AdMobService: Live interstitial ad displayed successfully");
+      console.log("AdMobService: Live interstitial ad displayed - domain verification active");
       return true;
     } catch (error) {
       console.error("AdMobService: Interstitial ad failed (app continues safely):", error);

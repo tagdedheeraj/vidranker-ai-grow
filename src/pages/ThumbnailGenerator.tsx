@@ -15,7 +15,6 @@ const ThumbnailGenerator = () => {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [selectedStyle, setSelectedStyle] = useState("photorealistic");
   const [generationStatus, setGenerationStatus] = useState<string>("");
-  const [generationMethod, setGenerationMethod] = useState<string>("");
 
   const styles = [
     { id: "photorealistic", name: "Photorealistic", description: "Realistic photos" },
@@ -31,10 +30,10 @@ const ThumbnailGenerator = () => {
     }
 
     setIsGenerating(true);
-    setGenerationStatus("🚀 Initializing thumbnail generation...");
+    setGenerationStatus("🚀 Initializing Hugging Face AI generation...");
     
     try {
-      console.log("🎯 Starting enhanced thumbnail generation...");
+      console.log("🎯 Starting Hugging Face thumbnail generation...");
       
       const result = await EnhancedImageGenerationService.generateImage(
         prompt, 
@@ -48,28 +47,11 @@ const ThumbnailGenerator = () => {
       if (result.success && result.imageUrl) {
         setGeneratedImage(result.imageUrl);
         
-        // Show appropriate success message based on generation method
-        let successMessage = "🎨 Thumbnail generated successfully!";
-        let methodInfo = "";
-        
-        switch (result.method) {
-          case 'ai-service':
-            successMessage = `🤖 AI thumbnail generated with ${result.serviceName}!`;
-            methodInfo = `✅ Generated using ${result.serviceName} AI model`;
-            break;
-          case 'canvas':
-            successMessage = "🎨 Custom thumbnail created!";
-            methodInfo = "🖼️ Generated using advanced canvas rendering";
-            break;
-          case 'placeholder':
-            successMessage = "📝 Text-based thumbnail created!";
-            methodInfo = "📋 Generated fallback placeholder";
-            break;
-        }
+        const successMessage = "🤖 AI thumbnail generated successfully with Hugging Face!";
+        const methodInfo = "✅ Generated using Hugging Face FLUX AI model";
         
         toast.success(successMessage);
         setGenerationStatus(methodInfo);
-        setGenerationMethod(result.method);
         
         // Auto-save to history
         try {
@@ -80,8 +62,8 @@ const ThumbnailGenerator = () => {
               prompt, 
               imageUrl: result.imageUrl, 
               style: selectedStyle,
-              method: result.method,
-              serviceName: result.serviceName 
+              method: 'ai-service',
+              serviceName: 'Hugging Face' 
             }
           });
           console.log("💾 Thumbnail saved to history");
@@ -89,7 +71,7 @@ const ThumbnailGenerator = () => {
           console.error("❌ Error saving thumbnail:", saveError);
         }
       } else {
-        throw new Error(result.error || "Unknown generation error");
+        throw new Error(result.error || "Hugging Face generation failed");
       }
       
     } catch (error) {
@@ -108,7 +90,7 @@ const ThumbnailGenerator = () => {
     try {
       const link = document.createElement('a');
       link.href = generatedImage;
-      link.download = `vidranker-thumbnail-${Date.now()}.jpg`;
+      link.download = `huggingface-thumbnail-${Date.now()}.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -125,8 +107,8 @@ const ThumbnailGenerator = () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'My VidRanker Thumbnail',
-          text: 'Check out my awesome YouTube thumbnail created with VidRanker!',
+          title: 'My Hugging Face AI Thumbnail',
+          text: 'Check out my AI-generated YouTube thumbnail created with Hugging Face!',
           url: generatedImage
         });
       } catch (error) {
@@ -163,10 +145,10 @@ const ThumbnailGenerator = () => {
     <div className="space-y-6 pb-20 md:pb-8">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-4 gradient-text">
-          Thumbnail Generator
+          AI Thumbnail Generator
         </h1>
         <p className="text-lg text-muted-foreground">
-          Create eye-catching thumbnails that drive clicks and views
+          Create eye-catching thumbnails using Hugging Face AI
         </p>
       </div>
 
@@ -181,10 +163,10 @@ const ThumbnailGenerator = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5" />
-            Choose Style
+            Choose AI Style
           </CardTitle>
           <CardDescription>
-            Select the visual style for your thumbnail
+            Select the visual style for your AI-generated thumbnail
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -215,7 +197,7 @@ const ThumbnailGenerator = () => {
             Describe Your Thumbnail
           </CardTitle>
           <CardDescription>
-            Be specific about colors, objects, people, and emotions you want
+            Be specific about colors, objects, people, and emotions you want in your AI thumbnail
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -234,12 +216,12 @@ const ThumbnailGenerator = () => {
               {isGenerating ? (
                 <>
                   <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                  Creating Your Thumbnail...
+                  Creating AI Thumbnail...
                 </>
               ) : (
                 <>
                   <Image className="w-5 h-5 mr-2" />
-                  Generate Thumbnail
+                  Generate AI Thumbnail
                 </>
               )}
             </Button>
@@ -249,7 +231,7 @@ const ThumbnailGenerator = () => {
                 disabled={isGenerating}
                 variant="outline"
                 className="px-6"
-                title="Generate new version"
+                title="Generate new AI version"
               >
                 <RefreshCw className="w-5 h-5" />
               </Button>
@@ -265,13 +247,10 @@ const ThumbnailGenerator = () => {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Image className="w-5 h-5 text-success" />
-                Your Generated Thumbnail
-                {generationMethod && (
-                  <Badge variant="secondary" className="ml-2">
-                    {generationMethod === 'ai-service' ? 'AI Generated' : 
-                     generationMethod === 'canvas' ? 'Custom Generated' : 'Text Based'}
-                  </Badge>
-                )}
+                Your AI Generated Thumbnail
+                <Badge variant="secondary" className="ml-2">
+                  Hugging Face AI
+                </Badge>
               </CardTitle>
               <Button onClick={saveToHistory} variant="outline" size="sm">
                 <Save className="w-4 h-4 mr-2" />
@@ -283,7 +262,7 @@ const ThumbnailGenerator = () => {
             <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
               <img
                 src={generatedImage}
-                alt="Generated thumbnail"
+                alt="AI Generated thumbnail"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   console.error("Image display error:", e);

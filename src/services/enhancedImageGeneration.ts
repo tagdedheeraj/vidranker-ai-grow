@@ -18,50 +18,67 @@ export class EnhancedImageGenerationService {
     onStatusUpdate?: (status: string) => void
   ): Promise<ImageGenerationResult> {
     
-    console.log('🚀 Starting Hugging Face SDXL image generation for prompt:', prompt);
-    onStatusUpdate?.('🎨 Starting AI thumbnail generation with Hugging Face SDXL...');
+    console.log('🚀 Starting enhanced image generation for prompt:', prompt);
+    onStatusUpdate?.('🔑 Validating API key and connecting to Hugging Face...');
     
     try {
-      onStatusUpdate?.('🔄 Connecting to Hugging Face Stable Diffusion XL model...');
-      console.log('🔄 Attempting generation with Hugging Face SDXL');
+      // Step 1: Validate API availability with better error messages
+      onStatusUpdate?.('🔍 Checking API availability...');
+      console.log('🔍 Checking Hugging Face API availability...');
       
-      // First check if the service is available
       const isAvailable = await this.huggingFaceService.isAvailable();
       if (!isAvailable) {
-        throw new Error('Hugging Face API is not available. Please check your API key.');
+        throw new Error('Hugging Face API is not available. Please check your API key permissions or try again later.');
       }
       
-      onStatusUpdate?.('✅ API key verified, generating image...');
+      onStatusUpdate?.('✅ API key validated! Starting image generation...');
+      console.log('✅ API validation successful, proceeding with generation');
+      
+      // Step 2: Generate image with detailed status updates
+      onStatusUpdate?.('🎨 Generating your thumbnail with AI (this may take 20-30 seconds)...');
       
       const imageUrl = await Promise.race([
         this.huggingFaceService.generate(prompt, style),
         new Promise<string>((_, reject) => 
-          setTimeout(() => reject(new Error('Generation timeout after 90 seconds')), 90000)
+          setTimeout(() => reject(new Error('Generation timeout after 60 seconds. Please try again.')), 60000)
         )
       ]);
       
-      console.log('🎯 Hugging Face SDXL generated URL:', imageUrl);
+      console.log('🎯 Successfully generated image URL:', imageUrl ? 'Valid URL received' : 'No URL');
       
-      onStatusUpdate?.('✅ Successfully generated with Hugging Face Stable Diffusion XL!');
-      console.log('🎉 Successfully generated thumbnail with Hugging Face SDXL');
+      onStatusUpdate?.('✅ Successfully generated with Hugging Face Stable Diffusion!');
+      console.log('🎉 Complete success - thumbnail generated with updated API key');
       
       return {
         success: true,
         imageUrl,
         method: 'ai-service',
-        serviceName: 'Hugging Face SDXL'
+        serviceName: 'Hugging Face Stable Diffusion v1.5'
       };
       
     } catch (error) {
-      console.error('❌ Hugging Face SDXL generation failed:', error);
+      console.error('❌ Enhanced generation failed:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      onStatusUpdate?.(`❌ Generation failed: ${errorMessage}`);
+      
+      // Provide specific guidance based on error type
+      let userFriendlyMessage = errorMessage;
+      if (errorMessage.includes('authentication failed')) {
+        userFriendlyMessage = 'API key authentication failed. Please verify your Hugging Face API key has write permissions.';
+      } else if (errorMessage.includes('loading')) {
+        userFriendlyMessage = 'AI model is loading. Please wait 20-30 seconds and try again.';
+      } else if (errorMessage.includes('rate limit')) {
+        userFriendlyMessage = 'Too many requests. Please wait a moment before trying again.';
+      } else if (errorMessage.includes('timeout')) {
+        userFriendlyMessage = 'Request timed out. The AI model may be busy, please try again.';
+      }
+      
+      onStatusUpdate?.(`❌ Generation failed: ${userFriendlyMessage}`);
       
       return {
         success: false,
-        error: `Hugging Face generation failed: ${errorMessage}`,
+        error: userFriendlyMessage,
         method: 'ai-service',
-        serviceName: 'Hugging Face SDXL'
+        serviceName: 'Hugging Face Stable Diffusion v1.5'
       };
     }
   }

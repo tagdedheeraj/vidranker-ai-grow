@@ -1,4 +1,3 @@
-
 import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 
@@ -28,13 +27,13 @@ class AdMobService {
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       await AdMob.initialize({
-        testingDevices: ['2077ef9a63d2b398840261c8221a0c9b'],
-        initializeForTesting: true,
+        testingDevices: [], // Empty array for production
+        initializeForTesting: false, // Disabled for live ads
       });
 
       this.isInitialized = true;
       this.initializationFailed = false;
-      console.log("AdMobService: Initialized successfully");
+      console.log("AdMobService: Initialized successfully for live ads");
     } catch (error) {
       console.error("AdMobService: Initialization failed (app continues):", error);
       this.isInitialized = false;
@@ -60,15 +59,15 @@ class AdMobService {
       }
 
       const bannerOptions: BannerAdOptions = {
-        adId: 'ca-app-pub-3940256099942544/6300978111', // Google Test Banner
+        adId: 'ca-app-pub-2211398170597117/2547153500', // Your live banner ad unit
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: true
+        isTesting: false // Live ads enabled
       };
 
       await AdMob.showBanner(bannerOptions);
-      console.log("AdMobService: Banner ad displayed successfully");
+      console.log("AdMobService: Live banner ad displayed successfully");
       return true;
     } catch (error) {
       console.error("AdMobService: Banner ad failed (non-fatal):", error);
@@ -94,12 +93,12 @@ class AdMobService {
       }
 
       await AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-3940256099942544/1033173712', // Google Test Interstitial
-        isTesting: true
+        adId: 'ca-app-pub-2211398170597117/8371175883', // Your live interstitial ad unit
+        isTesting: false // Live ads enabled
       });
 
       await AdMob.showInterstitial();
-      console.log("AdMobService: Interstitial ad displayed successfully");
+      console.log("AdMobService: Live interstitial ad displayed successfully");
       return true;
     } catch (error) {
       console.error("AdMobService: Interstitial ad failed (non-fatal):", error);

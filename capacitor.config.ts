@@ -21,8 +21,8 @@ const config: CapacitorConfig = {
     },
     AdMob: {
       applicationId: 'ca-app-pub-2211398170597117~9683407494',
-      initializeForTesting: true,
-      testDeviceIds: ['2077ef9a63d2b398840261c8221a0c9b'],
+      initializeForTesting: false, // Live ads enabled
+      testDeviceIds: [], // Empty for production
     },
   },
   android: {

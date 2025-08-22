@@ -1,16 +1,17 @@
 
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BottomNavigation from "@/components/BottomNavigation";
 
-const Index = lazy(() => import("@/pages/Index"));
+const Home = lazy(() => import("@/pages/Home"));
 const SEOGenerator = lazy(() => import("@/pages/SEOGenerator"));
 const ThumbnailGenerator = lazy(() => import("@/pages/ThumbnailGenerator"));
 const History = lazy(() => import("@/pages/History"));
@@ -40,8 +41,10 @@ const App = () => {
               <main className="flex-1">
                 <Suspense fallback={<div className="flex items-center justify-center min-h-[50vh]">Loading...</div>}>
                   <Routes>
-                    <Route path="/" element={<Index />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/seo" element={<SEOGenerator />} />
                     <Route path="/seo-generator" element={<SEOGenerator />} />
+                    <Route path="/thumbnails" element={<ThumbnailGenerator />} />
                     <Route path="/thumbnail-generator" element={<ThumbnailGenerator />} />
                     <Route path="/history" element={<History />} />
                     <Route path="/settings" element={<Settings />} />

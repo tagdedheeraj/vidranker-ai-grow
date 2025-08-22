@@ -1,0 +1,25 @@
+
+{
+  "routes": [
+    {
+      "src": "/app-ads.txt",
+      "dest": "/app-ads.txt"
+    },
+    {
+      "src": "/robots.txt", 
+      "dest": "/robots.txt"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|json|txt|xml))$",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

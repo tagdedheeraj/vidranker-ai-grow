@@ -1,0 +1,17 @@
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Serve static files directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^.*$ - [L]
+
+# Serve directories directly  
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^.*$ - [L]
+
+# For specific static file extensions, serve directly
+RewriteRule \.(txt|json|ico|png|jpg|jpeg|gif|svg|xml)$ - [L]
+
+# SPA fallback for all other routes
+RewriteRule ^(.*)$ /index.html [QSA,L]

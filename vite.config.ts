@@ -15,27 +15,35 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
-    // Custom plugin to ensure app-ads.txt is copied to dist root
+    // Custom plugin to ensure static files are copied to dist root
     {
-      name: 'copy-app-ads',
+      name: 'copy-static-files',
       generateBundle() {
-        // This ensures app-ads.txt is copied to dist root during build
-        const srcPath = path.resolve(__dirname, 'public/app-ads.txt');
-        const destPath = path.resolve(__dirname, 'dist/app-ads.txt');
+        const staticFiles = [
+          'app-ads.txt',
+          'robots.txt',
+          '.htaccess',
+          '_redirects'
+        ];
         
-        try {
-          if (existsSync(srcPath)) {
-            // Ensure dist directory exists
-            const distDir = path.dirname(destPath);
-            if (!existsSync(distDir)) {
-              mkdirSync(distDir, { recursive: true });
+        staticFiles.forEach(fileName => {
+          const srcPath = path.resolve(__dirname, `public/${fileName}`);
+          const destPath = path.resolve(__dirname, `dist/${fileName}`);
+          
+          try {
+            if (existsSync(srcPath)) {
+              // Ensure dist directory exists
+              const distDir = path.dirname(destPath);
+              if (!existsSync(distDir)) {
+                mkdirSync(distDir, { recursive: true });
+              }
+              copyFileSync(srcPath, destPath);
+              console.log(`✓ ${fileName} copied to dist root`);
             }
-            copyFileSync(srcPath, destPath);
-            console.log('✓ app-ads.txt copied to dist root');
+          } catch (error) {
+            console.warn(`Warning: Could not copy ${fileName}:`, error);
           }
-        } catch (error) {
-          console.warn('Warning: Could not copy app-ads.txt:', error);
-        }
+        });
       }
     }
   ].filter(Boolean),
@@ -44,7 +52,7 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Ensure static files like app-ads.txt are properly served
+  // Ensure static files are properly served and copied
   publicDir: 'public',
   build: {
     copyPublicDir: true,
@@ -52,6 +60,8 @@ export default defineConfig(({ mode }) => ({
       input: {
         main: path.resolve(__dirname, 'index.html')
       }
-    }
+    },
+    // Ensure static files are not processed by build
+    assetsInlineLimit: 0
   }
 }));

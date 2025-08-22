@@ -1,0 +1,20 @@
+
+# Static files - serve directly without routing through React
+/app-ads.txt   /app-ads.txt   200
+/robots.txt    /robots.txt    200
+/favicon.ico   /favicon.ico   200
+/*.png         /*.png         200
+/*.jpg         /*.jpg         200
+/*.jpeg        /*.jpeg        200
+/*.gif         /*.gif         200
+/*.svg         /*.svg         200
+/*.ico         /*.ico         200
+/*.json        /*.json        200
+/*.txt         /*.txt         200
+/*.xml         /*.xml         200
+
+# API routes (if any)
+/api/*         /api/*         200
+
+# SPA fallback - only for non-static files
+/*             /index.html    200

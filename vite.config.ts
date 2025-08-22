@@ -23,6 +23,7 @@ export default defineConfig(({ mode }) => ({
   // Ensure static files like app-ads.txt are properly served
   publicDir: 'public',
   build: {
+    copyPublicDir: true,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html')

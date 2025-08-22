@@ -1,6 +1,8 @@
 
-# Handle app-ads.txt properly
+# Handle static files first - these should be served directly
 /app-ads.txt /app-ads.txt 200
+/robots.txt /robots.txt 200
+/.well-known/* /.well-known/:splat 200
 
-# SPA fallback
+# SPA fallback for all other routes
 /* /index.html 200

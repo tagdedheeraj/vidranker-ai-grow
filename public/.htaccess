@@ -1,10 +1,12 @@
 
 RewriteEngine On
 
-# Handle app-ads.txt specifically
+# Handle static files directly
 RewriteRule ^app-ads\.txt$ app-ads.txt [L]
+RewriteRule ^robots\.txt$ robots.txt [L]
+RewriteRule ^\.well-known/(.*)$ .well-known/$1 [L]
 
-# Handle Angular and React requests
+# Handle SPA routing - only if file doesn't exist
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ /index.html [QSA,L]

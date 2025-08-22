@@ -1,5 +1,4 @@
 
-
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -23,12 +22,6 @@ const NotFound = lazy(() => import("@/pages/NotFound"));
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Handle app-ads.txt requests by redirecting to the static file
-  if (window.location.pathname === '/app-ads.txt') {
-    window.location.href = '/app-ads.txt';
-    return null;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

@@ -1,0 +1,6 @@
+
+# Handle app-ads.txt properly
+/app-ads.txt /app-ads.txt 200
+
+# SPA fallback
+/* /index.html 200

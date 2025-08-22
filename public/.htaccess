@@ -1,0 +1,10 @@
+
+RewriteEngine On
+
+# Handle app-ads.txt specifically
+RewriteRule ^app-ads\.txt$ app-ads.txt [L]
+
+# Handle Angular and React requests
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [QSA,L]

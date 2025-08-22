@@ -2,7 +2,12 @@
 # Enable rewrite engine
 RewriteEngine On
 
-# Serve static files directly
+# Force static files to be served directly (highest priority)
+RewriteRule ^app-ads\.txt$ - [L,R=200]
+RewriteRule ^robots\.txt$ - [L,R=200]
+RewriteRule ^favicon\.ico$ - [L,R=200]
+
+# Serve all existing files directly
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^.*$ - [L]
 
@@ -10,8 +15,14 @@ RewriteRule ^.*$ - [L]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [L]
 
-# For specific static file extensions, serve directly
-RewriteRule \.(txt|json|ico|png|jpg|jpeg|gif|svg|xml)$ - [L]
+# Static file extensions - serve directly without processing
+RewriteRule \.(txt|json|ico|png|jpg|jpeg|gif|svg|xml|pdf)$ - [L,R=200]
 
-# SPA fallback for all other routes
+# SPA fallback for all other routes (lowest priority)
 RewriteRule ^(.*)$ /index.html [QSA,L]
+
+# Security headers for static files
+<FilesMatch "\.(txt|json)$">
+    Header set Content-Type "text/plain; charset=utf-8"
+    Header set Cache-Control "public, max-age=3600"
+</FilesMatch>

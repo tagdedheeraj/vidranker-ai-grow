@@ -15,16 +15,19 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'development' &&
     componentTagger(),
-    // Custom plugin to ensure static files are copied to dist root
+    // Enhanced plugin to ensure static files are copied to dist root
     {
-      name: 'copy-static-files',
-      generateBundle() {
+      name: 'copy-static-files-to-root',
+      writeBundle() {
         const staticFiles = [
           'app-ads.txt',
           'robots.txt',
           '.htaccess',
-          '_redirects'
+          '_redirects',
+          'favicon.ico'
         ];
+        
+        console.log('🔧 Starting static file copy process...');
         
         staticFiles.forEach(fileName => {
           const srcPath = path.resolve(__dirname, `public/${fileName}`);
@@ -38,12 +41,16 @@ export default defineConfig(({ mode }) => ({
                 mkdirSync(distDir, { recursive: true });
               }
               copyFileSync(srcPath, destPath);
-              console.log(`✓ ${fileName} copied to dist root`);
+              console.log(`✅ ${fileName} copied to dist root successfully`);
+            } else {
+              console.warn(`⚠️  ${fileName} not found in public directory`);
             }
           } catch (error) {
-            console.warn(`Warning: Could not copy ${fileName}:`, error);
+            console.error(`❌ Error copying ${fileName}:`, error);
           }
         });
+        
+        console.log('🎉 Static file copy process completed');
       }
     }
   ].filter(Boolean),
@@ -52,16 +59,18 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Ensure static files are properly served and copied
+  // Enhanced public directory handling
   publicDir: 'public',
   build: {
     copyPublicDir: true,
+    outDir: 'dist',
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, 'index.html')
       }
     },
-    // Ensure static files are not processed by build
+    // Ensure static files are not processed by build pipeline
     assetsInlineLimit: 0
   }
 }));

@@ -3,17 +3,20 @@
   publish = "dist"
   command = "npm run build"
 
+# High priority redirects for static files
 [[redirects]]
   from = "/app-ads.txt"
   to = "/app-ads.txt"
   status = 200
   force = true
+  headers = {Content-Type = "text/plain; charset=utf-8"}
 
 [[redirects]]
   from = "/robots.txt"  
   to = "/robots.txt"
   status = 200
   force = true
+  headers = {Content-Type = "text/plain; charset=utf-8"}
 
 [[redirects]]
   from = "/favicon.ico"
@@ -21,6 +24,7 @@
   status = 200
   force = true
 
+# Pattern redirects for all static file types
 [[redirects]]
   from = "/*.txt"
   to = "/:splat.txt"
@@ -52,11 +56,42 @@
   force = true
 
 [[redirects]]
+  from = "/*.jpeg"
+  to = "/:splat.jpeg"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*.gif"
+  to = "/:splat.gif"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/*.svg"
   to = "/:splat.svg"
   status = 200
   force = true
 
+[[redirects]]
+  from = "/*.xml"
+  to = "/:splat.xml"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*.pdf"
+  to = "/:splat.pdf"
+  status = 200
+  force = true
+
+# API routes
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 200
+
+# SPA fallback (lowest priority)
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -64,3 +99,18 @@
 
 [build.environment]
   NODE_VERSION = "18"
+
+# Additional settings for better static file handling
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = false

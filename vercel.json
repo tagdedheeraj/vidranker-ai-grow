@@ -3,23 +3,45 @@
   "routes": [
     {
       "src": "/app-ads.txt",
-      "dest": "/app-ads.txt"
+      "dest": "/app-ads.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=3600"
+      }
     },
     {
       "src": "/robots.txt", 
-      "dest": "/robots.txt"
+      "dest": "/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8"
+      }
     },
     {
       "src": "/favicon.ico",
-      "dest": "/favicon.ico"
+      "dest": "/favicon.ico",
+      "headers": {
+        "Cache-Control": "public, max-age=86400"
+      }
     },
     {
-      "src": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|json|txt|xml))$",
-      "dest": "/$1"
+      "src": "/(.*\\.(txt|json|ico|png|jpg|jpeg|gif|svg|xml|pdf))$",
+      "dest": "/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=3600"
+      }
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "functions": {
+    "src/api/**": {
+      "runtime": "@vercel/node@2"
+    }
+  }
 }

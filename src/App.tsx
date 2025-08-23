@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,6 +30,24 @@ const queryClient = new QueryClient({
 });
 
 const App = () => {
+  // Critical: Check if current path should bypass React Router
+  useEffect(() => {
+    const path = window.location.pathname;
+    const staticFiles = [
+      '/app-ads.txt', 
+      '/.well-known/app-ads.txt',
+      '/robots.txt',
+      '/favicon.ico'
+    ];
+    
+    if (staticFiles.includes(path)) {
+      console.log('Static file requested, bypassing React Router:', path);
+      // Force browser to fetch the actual file
+      window.location.reload();
+      return;
+    }
+  }, []);
+
   useEffect(() => {
     const initializeApp = async () => {
       try {

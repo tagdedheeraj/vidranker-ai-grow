@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import { adMobService } from "./services/admob";
+import AppAdsText from "./components/AppAdsText";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -141,20 +141,28 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <div className="min-h-screen bg-background">
-              <Header />
-              <main className="container mx-auto px-4 py-6">
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/seo" element={<SEOGenerator />} />
-                  <Route path="/thumbnails" element={<ThumbnailGenerator />} />
-                  <Route path="/history" element={<History />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/privacy" element={<PrivacyPolicy />} />
-                  <Route path="/terms" element={<TermsOfService />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <BottomNavigation />
+              <Routes>
+                <Route path="/app-ads.txt" element={<AppAdsText />} />
+                <Route path="/.well-known/app-ads.txt" element={<AppAdsText />} />
+                <Route path="/*" element={
+                  <>
+                    <Header />
+                    <main className="container mx-auto px-4 py-6">
+                      <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/seo" element={<SEOGenerator />} />
+                        <Route path="/thumbnails" element={<ThumbnailGenerator />} />
+                        <Route path="/history" element={<History />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/privacy" element={<PrivacyPolicy />} />
+                        <Route path="/terms" element={<TermsOfService />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </main>
+                    <BottomNavigation />
+                  </>
+                } />
+              </Routes>
             </div>
           </BrowserRouter>
         </TooltipProvider>

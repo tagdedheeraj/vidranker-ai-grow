@@ -5,19 +5,13 @@ const config: CapacitorConfig = {
   appId: 'com.vidrankersocilet.com',
   appName: 'VidRanker',
   webDir: 'dist',
-  // Comment out server URL for local loading - faster startup
-  // server: {
-  //   url: 'https://vidranker.space',
-  //   cleartext: true,
-  //   androidScheme: 'https'
-  // },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 3000, // Increased for better UX
+      launchShowDuration: 2000,
       backgroundColor: '#ffffff',
       androidSplashResourceName: 'splash',
       androidScaleType: 'CENTER_CROP',
-      showSpinner: true, // Show loading indicator
+      showSpinner: true,
       spinnerStyle: 'large',
       spinnerColor: '#000000',
       splashFullScreen: true,
@@ -27,8 +21,8 @@ const config: CapacitorConfig = {
     },
     AdMob: {
       applicationId: 'ca-app-pub-2211398170597117~9683407494',
-      initializeForTesting: false,
-      testDeviceIds: [],
+      initializeForTesting: false, // Production mode
+      testDeviceIds: [], // Empty for production
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
       maxAdContentRating: 'MA'
@@ -40,8 +34,8 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: true,
-    loggingBehavior: 'none' // Optimize performance
+    webContentsDebuggingEnabled: false, // Disabled for production
+    loggingBehavior: 'none'
   },
   ios: {
     contentInset: 'automatic',

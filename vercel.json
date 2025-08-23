@@ -6,14 +6,23 @@
       "dest": "/app-ads.txt",
       "headers": {
         "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "public, max-age=3600"
+        "Cache-Control": "public, max-age=86400"
+      }
+    },
+    {
+      "src": "/.well-known/app-ads.txt",
+      "dest": "/.well-known/app-ads.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=86400"
       }
     },
     {
       "src": "/robots.txt", 
       "dest": "/robots.txt",
       "headers": {
-        "Content-Type": "text/plain; charset=utf-8"
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=3600"
       }
     },
     {

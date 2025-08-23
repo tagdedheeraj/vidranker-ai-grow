@@ -2,12 +2,18 @@
 # Enable rewrite engine
 RewriteEngine On
 
-# Force static files to be served directly (highest priority)
+# CRITICAL: Force static files to be served directly (HIGHEST PRIORITY)
+# These rules MUST come first to prevent SPA routing interference
+
+# AdMob verification file - HIGHEST PRIORITY
 RewriteRule ^app-ads\.txt$ - [L,R=200]
+RewriteRule ^\.well-known/app-ads\.txt$ - [L,R=200]
+
+# Other critical static files
 RewriteRule ^robots\.txt$ - [L,R=200]
 RewriteRule ^favicon\.ico$ - [L,R=200]
 
-# Serve all existing files directly
+# Serve all existing files directly (prevents SPA routing)
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^.*$ - [L]
 
@@ -15,14 +21,23 @@ RewriteRule ^.*$ - [L]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [L]
 
-# Static file extensions - serve directly without processing
+# Static file extensions - force direct serving
 RewriteRule \.(txt|json|ico|png|jpg|jpeg|gif|svg|xml|pdf)$ - [L,R=200]
 
-# SPA fallback for all other routes (lowest priority)
+# Well-known directory handling
+RewriteRule ^\.well-known/ - [L,R=200]
+
+# SPA fallback for all other routes (LOWEST priority)
 RewriteRule ^(.*)$ /index.html [QSA,L]
 
-# Security headers for static files
+# Security and content-type headers for static files
 <FilesMatch "\.(txt|json)$">
     Header set Content-Type "text/plain; charset=utf-8"
     Header set Cache-Control "public, max-age=3600"
 </FilesMatch>
+
+# Specific handling for app-ads.txt
+<Files "app-ads.txt">
+    Header set Content-Type "text/plain; charset=utf-8"
+    Header set Cache-Control "public, max-age=86400"
+</Files>

@@ -1,11 +1,16 @@
 
-# Static files - serve directly with highest priority
+# CRITICAL: Static files MUST be served directly with HIGHEST priority
+# These rules MUST come first and use force=true to override SPA routing
+
+# AdMob verification file - HIGHEST PRIORITY
 /app-ads.txt   /app-ads.txt   200!
+
+# Other critical static files
 /robots.txt    /robots.txt    200!
 /favicon.ico   /favicon.ico   200!
 /.htaccess     /.htaccess     200!
 
-# All file extensions that should be served directly
+# Static file extensions - serve directly without SPA routing
 /*.txt         /:splat.txt    200!
 /*.json        /:splat.json   200!
 /*.ico         /:splat.ico    200!
@@ -17,8 +22,12 @@
 /*.xml         /:splat.xml    200!
 /*.pdf         /:splat.pdf    200!
 
+# Well-known directory for app-ads.txt (alternative location)
+/.well-known/app-ads.txt   /.well-known/app-ads.txt   200!
+/.well-known/*             /.well-known/:splat        200!
+
 # API routes (if any) - preserve for future use
 /api/*         /api/:splat    200
 
-# SPA fallback - only for non-static files (lowest priority)
+# SPA fallback - LOWEST priority, only for non-static files
 /*             /index.html    200

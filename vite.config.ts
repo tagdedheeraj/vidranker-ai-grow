@@ -18,7 +18,12 @@ export default defineConfig(({ mode }) => ({
     // Enhanced plugin to ensure static files are copied to dist root
     {
       name: 'copy-static-files-to-root',
+      generateBundle() {
+        // This runs during build generation
+        console.log('🔧 generateBundle: Preparing static file copy...');
+      },
       writeBundle() {
+        // This runs after build is complete
         const staticFiles = [
           'app-ads.txt',
           'robots.txt',
@@ -27,7 +32,7 @@ export default defineConfig(({ mode }) => ({
           'favicon.ico'
         ];
         
-        console.log('🔧 Starting static file copy process...');
+        console.log('🔧 writeBundle: Starting static file copy process...');
         
         staticFiles.forEach(fileName => {
           const srcPath = path.resolve(__dirname, `public/${fileName}`);
@@ -42,8 +47,15 @@ export default defineConfig(({ mode }) => ({
               }
               copyFileSync(srcPath, destPath);
               console.log(`✅ ${fileName} copied to dist root successfully`);
+              
+              // Verify the file was copied
+              if (existsSync(destPath)) {
+                console.log(`✅ Verified: ${fileName} exists in dist`);
+              } else {
+                console.error(`❌ Verification failed: ${fileName} not found in dist`);
+              }
             } else {
-              console.warn(`⚠️  ${fileName} not found in public directory`);
+              console.warn(`⚠️  ${fileName} not found in public directory at ${srcPath}`);
             }
           } catch (error) {
             console.error(`❌ Error copying ${fileName}:`, error);
@@ -51,6 +63,16 @@ export default defineConfig(({ mode }) => ({
         });
         
         console.log('🎉 Static file copy process completed');
+      },
+      closeBundle() {
+        // Final verification
+        console.log('🔍 closeBundle: Final verification of static files...');
+        const appAdsPath = path.resolve(__dirname, 'dist/app-ads.txt');
+        if (existsSync(appAdsPath)) {
+          console.log('✅ Final check: app-ads.txt confirmed in dist folder');
+        } else {
+          console.error('❌ Final check: app-ads.txt missing from dist folder');
+        }
       }
     }
   ].filter(Boolean),

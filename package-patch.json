@@ -1,0 +1,7 @@
+
+{
+  "scripts": {
+    "verify-build": "node verify-build.js",
+    "build-and-verify": "npm run build && npm run verify-build"
+  }
+}

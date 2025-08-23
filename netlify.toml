@@ -3,23 +3,24 @@
   publish = "dist"
   command = "npm run build"
 
-# HIGHEST PRIORITY: Static files must be served directly
+# CRITICAL: AdMob app-ads.txt file - ABSOLUTE HIGHEST PRIORITY
 [[redirects]]
   from = "/app-ads.txt"
   to = "/app-ads.txt"
   status = 200
   force = true
-  headers = {Content-Type = "text/plain; charset=utf-8", Cache-Control = "public, max-age=86400"}
+  headers = {Content-Type = "text/plain; charset=utf-8", Cache-Control = "public, max-age=86400", X-Robots-Tag = "noindex"}
 
 [[redirects]]
   from = "/.well-known/app-ads.txt"
-  to = "/.well-known/app-ads.txt"
+  to = "/.well-known/app-ads.txt"  
   status = 200
   force = true
   headers = {Content-Type = "text/plain; charset=utf-8", Cache-Control = "public, max-age=86400"}
 
+# Other critical static files
 [[redirects]]
-  from = "/robots.txt"  
+  from = "/robots.txt"
   to = "/robots.txt"
   status = 200
   force = true
@@ -27,11 +28,22 @@
 
 [[redirects]]
   from = "/favicon.ico"
-  to = "/favicon.ico" 
+  to = "/favicon.ico"
   status = 200
   force = true
 
-# Pattern redirects for all static file types
+# All static file extensions - MUST come before SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/:splat"
+  status = 200
+  force = true
+  conditions = {Role = ["admin"], Country = ["US"]}
+  headers = {}
+  query = {}
+  signed = ""
+  edge_handler = ""
+  
 [[redirects]]
   from = "/*.txt"
   to = "/:splat.txt"
@@ -63,49 +75,12 @@
   force = true
 
 [[redirects]]
-  from = "/*.jpeg"
-  to = "/:splat.jpeg"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/*.gif"
-  to = "/:splat.gif"
-  status = 200
-  force = true
-
-[[redirects]]
   from = "/*.svg"
   to = "/:splat.svg"
   status = 200
   force = true
 
-[[redirects]]
-  from = "/*.xml"
-  to = "/:splat.xml"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/*.pdf"
-  to = "/:splat.pdf"
-  status = 200
-  force = true
-
-# Well-known directory
-[[redirects]]
-  from = "/.well-known/*"
-  to = "/.well-known/:splat"
-  status = 200
-  force = true
-
-# API routes
-[[redirects]]
-  from = "/api/*"
-  to = "/api/:splat"
-  status = 200
-
-# SPA fallback (LOWEST priority)
+# SPA fallback - LOWEST priority (only for routes that don't match files)
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -114,16 +89,16 @@
 [build.environment]
   NODE_VERSION = "18"
 
-[build.processing]
-  skip_processing = false
+# Force static file processing
+[[headers]]
+  for = "/app-ads.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=86400"
+    X-Robots-Tag = "noindex"
 
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
-
-[build.processing.html]
-  pretty_urls = false
+[[headers]]
+  for = "/*.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"

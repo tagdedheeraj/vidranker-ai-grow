@@ -1,24 +1,35 @@
 
 {
+  "rewrites": [
+    {
+      "source": "/app-ads.txt",
+      "destination": "/app-ads.txt"
+    },
+    {
+      "source": "/.well-known/app-ads.txt", 
+      "destination": "/.well-known/app-ads.txt"
+    }
+  ],
   "routes": [
     {
       "src": "/app-ads.txt",
       "dest": "/app-ads.txt",
       "headers": {
         "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "public, max-age=86400"
+        "Cache-Control": "public, max-age=86400",
+        "X-Robots-Tag": "noindex"
       }
     },
     {
       "src": "/.well-known/app-ads.txt",
-      "dest": "/.well-known/app-ads.txt",
+      "dest": "/.well-known/app-ads.txt", 
       "headers": {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "public, max-age=86400"
       }
     },
     {
-      "src": "/robots.txt", 
+      "src": "/robots.txt",
       "dest": "/robots.txt",
       "headers": {
         "Content-Type": "text/plain; charset=utf-8",
@@ -47,10 +58,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "functions": {
-    "src/api/**": {
-      "runtime": "@vercel/node@2"
-    }
-  }
+  ]
 }

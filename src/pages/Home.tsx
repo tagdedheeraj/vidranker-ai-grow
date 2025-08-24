@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,12 +5,11 @@ import { Link } from "react-router-dom";
 import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-react";
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
-import { useAdMob } from "@/hooks/useAdMob";
-import { BannerAdPosition } from '@capacitor-community/admob';
+import { useAdMobService } from "@/hooks/useAdMobService";
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
-  const { isReady, showBanner, showInterstitial, error } = useAdMob();
+  const { isReady, showBanner, showInterstitial, error, isNativePlatform } = useAdMobService();
 
   useEffect(() => {
     setSavedCount(getSavedContent().length);
@@ -19,14 +17,14 @@ const Home = () => {
 
   useEffect(() => {
     // Show banner ad when component mounts and AdMob is ready
-    if (isReady) {
-      showBanner(BannerAdPosition.BOTTOM_CENTER);
+    if (isReady && isNativePlatform) {
+      showBanner();
     }
-  }, [isReady, showBanner]);
+  }, [isReady, showBanner, isNativePlatform]);
 
   const handleFeatureClick = async (href: string) => {
     // Show interstitial ad when user navigates to a feature
-    if (isReady) {
+    if (isReady && isNativePlatform) {
       await showInterstitial();
     }
   };
@@ -66,7 +64,18 @@ const Home = () => {
       {error && (
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-4">
-            <p className="text-red-600 text-sm">AdMob Error: {error}</p>
+            <p className="text-red-600 text-sm">⚠️ {error}</p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Platform Notice for Web Users */}
+      {!isNativePlatform && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="pt-4">
+            <p className="text-blue-600 text-sm">
+              🌐 You're viewing the web version. Download the mobile app to see ads and get the full experience!
+            </p>
           </CardContent>
         </Card>
       )}
@@ -125,8 +134,12 @@ const Home = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{isReady ? '✅' : '⏳'}</div>
-            <div className="text-sm text-muted-foreground">AdMob Status</div>
+            <div className="text-2xl font-bold text-primary">
+              {isNativePlatform ? (isReady ? '✅' : '❌') : '🌐'}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {isNativePlatform ? 'AdMob' : 'Web'}
+            </div>
           </CardContent>
         </Card>
       </div>

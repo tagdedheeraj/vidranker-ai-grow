@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,6 +29,8 @@ const queryClient = new QueryClient({
   },
 });
 
+import { adMobInit } from "./services/adMobInit";
+
 const App = () => {
   useEffect(() => {
     const path = window.location.pathname;
@@ -50,7 +51,7 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("🚀 VidRanker Starting - AdMob Production Mode");
+        console.log("🚀 VidRanker Starting - Production Mode");
         console.log("📱 Platform:", Capacitor.getPlatform());
         console.log("🔧 Native Platform:", Capacitor.isNativePlatform());
         
@@ -64,27 +65,24 @@ const App = () => {
               console.error("⚠️ Splash screen error:", error);
             }
           }, 2000);
-        }
-        
-        // Initialize AdMob for production
-        if (Capacitor.isNativePlatform()) {
-          console.log("🎯 Initializing AdMob for production ads...");
-          
+
+          // Initialize AdMob with new service
           setTimeout(async () => {
             try {
-              const success = await enhancedAdMobService.initialize();
+              console.log("🎯 Starting AdMob initialization...");
+              const success = await adMobInit.initialize();
+              
               if (success) {
-                console.log("✅ AdMob initialized successfully!");
-                console.log("📊 AdMob Status:", enhancedAdMobService.getStatus());
+                console.log("✅ AdMob ready for production ads!");
               } else {
                 console.log("❌ AdMob initialization failed");
               }
             } catch (error) {
-              console.error("💥 AdMob initialization error:", error);
+              console.error("💥 AdMob error:", error);
             }
           }, 1500);
         } else {
-          console.log("🌐 Web platform - AdMob disabled");
+          console.log("🌐 Web platform - AdMob will be initialized when app runs on mobile");
         }
         
       } catch (error) {
@@ -93,16 +91,6 @@ const App = () => {
     };
 
     initializeApp();
-
-    return () => {
-      try {
-        if (enhancedAdMobService && typeof enhancedAdMobService.destroy === 'function') {
-          enhancedAdMobService.destroy();
-        }
-      } catch (error) {
-        console.error("🧹 Cleanup error:", error);
-      }
-    };
   }, []);
 
   return (

@@ -1,196 +1,115 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Settings2, Info, Heart, Github, Twitter, Star, Zap, Shield, FileText } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import { clearAllContent } from "@/utils/localStorage";
+import { ExternalLink, Shield, FileText, Smartphone, Settings as SettingsIcon } from "lucide-react";
+import AdMobStatus from "@/components/AdMobStatus";
 
 const Settings = () => {
-  const handleClearData = () => {
-    if (confirm("Are you sure you want to clear all your saved data? This action cannot be undone.")) {
-      clearAllContent();
-      toast.success("All data cleared successfully");
-    }
-  };
+  const appVersion = "1.0.0";
+  const buildNumber = "001";
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-4 gradient-text">
-          Settings
-        </h1>
-        <p className="text-lg text-muted-foreground">
-          Manage your app preferences and data
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold mb-2">Settings</h1>
+        <p className="text-muted-foreground">
+          Manage your app preferences and view system information
         </p>
       </div>
 
-      {/* App Info */}
+      {/* AdMob Status & Controls */}
+      <AdMobStatus />
+
+      {/* App Information */}
       <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Info className="w-5 h-5" />
+            <Smartphone className="w-5 h-5" />
             App Information
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="font-medium">Version</span>
-            <Badge variant="secondary">1.0.0</Badge>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">Version</span>
+            <Badge variant="secondary">{appVersion}</Badge>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium">Platform</span>
-            <Badge variant="secondary">Web/Mobile</Badge>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">Build Number</span>
+            <Badge variant="outline">{buildNumber}</Badge>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium">AI Powered</span>
-            <Badge className="bg-gradient-primary text-white">
-              <Zap className="w-3 h-3 mr-1" />
-              Yes
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">Platform</span>
+            <Badge variant="default">
+              {typeof window !== 'undefined' && window.location.host.includes('localhost') ? 'Development' : 'Production'}
             </Badge>
           </div>
         </CardContent>
       </Card>
 
-      {/* Privacy First */}
+      {/* Legal & Privacy */}
       <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5" />
-            Privacy First
+            Legal & Privacy
           </CardTitle>
           <CardDescription>
-            Your privacy is our priority
+            Review our terms and privacy policies
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">Local Storage Only</p>
-              <p className="text-sm text-muted-foreground">All your content is stored locally on your device only</p>
+        <CardContent className="space-y-3">
+          <Link 
+            to="/privacy" 
+            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <FileText className="w-4 h-4" />
+              <span>Privacy Policy</span>
             </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              Private
-            </Badge>
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">No External Upload</p>
-              <p className="text-sm text-muted-foreground">Nothing is uploaded to external servers</p>
+            <ExternalLink className="w-4 h-4" />
+          </Link>
+          <Separator />
+          <Link 
+            to="/terms" 
+            className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <FileText className="w-4 h-4" />
+              <span>Terms of Service</span>
             </div>
-            <Badge variant="outline" className="text-green-600 border-green-600">
-              Secure
-            </Badge>
-          </div>
-          
-          <div className="flex gap-2 pt-4 border-t">
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link to="/privacy">
-                <Shield className="w-4 h-4 mr-2" />
-                Privacy Policy
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="sm" className="flex-1">
-              <Link to="/terms">
-                <FileText className="w-4 h-4 mr-2" />
-                Terms of Service
-              </Link>
-            </Button>
-          </div>
+            <ExternalLink className="w-4 h-4" />
+          </Link>
         </CardContent>
       </Card>
 
-      {/* Data Management */}
+      {/* System Information */}
       <Card className="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Settings2 className="w-5 h-5" />
-            Data Management
-          </CardTitle>
-          <CardDescription>
-            Manage your locally stored content
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="pt-4 border-t">
-            <Button
-              variant="destructive"
-              onClick={handleClearData}
-              className="w-full"
-            >
-              Clear All Data
-            </Button>
-            <p className="text-xs text-muted-foreground mt-2 text-center">
-              This will delete all your saved SEO content and thumbnails
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Features */}
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle>Features Available</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>AI-Powered SEO Content Generation</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Custom Thumbnail Creation</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Local Data Storage</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>History & Content Management</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span>Copy & Share Functionality</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* About */}
-      <Card className="glass">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Heart className="w-5 h-5 text-red-500" />
-            About VidRanker
+            <SettingsIcon className="w-5 h-5" />
+            System Information
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            VidRanker is an AI-powered tool to help creators optimize videos with SEO-friendly tags, 
-            descriptions, and thumbnails — designed to support your creative journey.
-          </p>
-          
-          <div className="flex items-center justify-center gap-4 pt-4">
-            <Button variant="ghost" size="sm">
-              <Github className="w-4 h-4 mr-2" />
-              GitHub
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Twitter className="w-4 h-4 mr-2" />
-              Twitter
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Star className="w-4 h-4 mr-2" />
-              Rate App
-            </Button>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">User Agent</span>
+            <Badge variant="outline" className="text-xs max-w-[200px] truncate">
+              {typeof navigator !== 'undefined' ? navigator.userAgent.split(' ')[0] : 'N/A'}
+            </Badge>
           </div>
-          
-          <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-            <p>© 2025 VidRanker. Built with ❤️ for creators</p>
-            <p className="mt-1">Made with Socilet 🚀</p>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">Screen Size</span>
+            <Badge variant="outline">
+              {typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'N/A'}
+            </Badge>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium">Language</span>
+            <Badge variant="outline">
+              {typeof navigator !== 'undefined' ? navigator.language : 'N/A'}
+            </Badge>
           </div>
         </CardContent>
       </Card>

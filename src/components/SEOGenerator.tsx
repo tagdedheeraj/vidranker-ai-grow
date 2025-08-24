@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Copy, Search, Sparkles, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { adMobService } from "@/services/admob";
+import { useAdMob } from "@/hooks/useAdMob";
 
 const SEOGenerator = () => {
   const [keyword, setKeyword] = useState("");
@@ -17,6 +18,8 @@ const SEOGenerator = () => {
     description: string;
   } | null>(null);
 
+  const { isReady, showInterstitial } = useAdMob();
+
   const saveToHistory = (data: { tags: string[]; title: string; description: string; keyword: string }) => {
     try {
       const history = JSON.parse(localStorage.getItem('seo-history') || '[]');
@@ -26,7 +29,6 @@ const SEOGenerator = () => {
         ...data
       };
       history.unshift(newEntry);
-      // Keep only last 50 entries
       const trimmedHistory = history.slice(0, 50);
       localStorage.setItem('seo-history', JSON.stringify(trimmedHistory));
     } catch (error) {
@@ -42,8 +44,8 @@ const SEOGenerator = () => {
 
     setIsGenerating(true);
     
-    // Simulate AI generation (replace with actual API call)
-    setTimeout(() => {
+    // Simulate AI generation
+    setTimeout(async () => {
       const sampleTags = [
         `${keyword}`,
         `${keyword} tutorial`,
@@ -88,7 +90,11 @@ const SEOGenerator = () => {
       toast.success("SEO content generated successfully!");
       
       // Show interstitial ad after successful generation
-      adMobService.showInterstitialAfterAction();
+      if (isReady) {
+        setTimeout(() => {
+          showInterstitial();
+        }, 1000);
+      }
     }, 2000);
   };
 

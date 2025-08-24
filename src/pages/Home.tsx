@@ -6,13 +6,30 @@ import { Link } from "react-router-dom";
 import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-react";
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
+import { useAdMob } from "@/hooks/useAdMob";
+import { BannerAdPosition } from '@capacitor-community/admob';
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
+  const { isReady, showBanner, showInterstitial, error } = useAdMob();
 
   useEffect(() => {
     setSavedCount(getSavedContent().length);
   }, []);
+
+  useEffect(() => {
+    // Show banner ad when component mounts and AdMob is ready
+    if (isReady) {
+      showBanner(BannerAdPosition.BOTTOM_CENTER);
+    }
+  }, [isReady, showBanner]);
+
+  const handleFeatureClick = async (href: string) => {
+    // Show interstitial ad when user navigates to a feature
+    if (isReady) {
+      await showInterstitial();
+    }
+  };
 
   const features = [
     {
@@ -45,6 +62,15 @@ const Home = () => {
 
   return (
     <div className="space-y-8 pb-20 md:pb-8">
+      {/* AdMob Error Display */}
+      {error && (
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="pt-4">
+            <p className="text-red-600 text-sm">AdMob Error: {error}</p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Hero Section */}
       <div className="relative bg-gradient-primary rounded-2xl p-8 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
@@ -63,7 +89,10 @@ const Home = () => {
               const Icon = action.icon;
               return (
                 <Link key={action.name} to={action.href}>
-                  <Button className={`${action.color} hover:opacity-90 text-white`}>
+                  <Button 
+                    className={`${action.color} hover:opacity-90 text-white`}
+                    onClick={() => handleFeatureClick(action.href)}
+                  >
                     <Icon className="w-4 h-4 mr-2" />
                     {action.name}
                   </Button>
@@ -96,8 +125,8 @@ const Home = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">Fast</div>
-            <div className="text-sm text-muted-foreground">Generation</div>
+            <div className="text-2xl font-bold text-primary">{isReady ? '✅' : '⏳'}</div>
+            <div className="text-sm text-muted-foreground">AdMob Status</div>
           </CardContent>
         </Card>
       </div>

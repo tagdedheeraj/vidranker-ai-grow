@@ -33,6 +33,8 @@ export class AdMobInitService {
   async initialize(): Promise<boolean> {
     try {
       console.log('🎯 AdMob: Starting initialization...');
+      console.log('📱 Platform:', Capacitor.getPlatform());
+      console.log('🔧 Native Platform:', Capacitor.isNativePlatform());
       
       if (!Capacitor.isNativePlatform()) {
         console.log('🌐 AdMob: Web platform detected - ads disabled');
@@ -44,6 +46,11 @@ export class AdMobInitService {
         return true;
       }
 
+      console.log('🚀 AdMob: Initializing with production settings...');
+      console.log('📊 App ID:', this.config.appId);
+      console.log('🎯 Banner ID:', this.config.bannerId);
+      console.log('📺 Interstitial ID:', this.config.interstitialId);
+
       // Initialize with production settings
       await AdMob.initialize({
         testingDevices: [], // Empty for production
@@ -51,11 +58,13 @@ export class AdMobInitService {
       });
 
       this.isInitialized = true;
-      console.log('✅ AdMob: Initialization successful!');
+      console.log('✅ AdMob: Production initialization successful!');
+      console.log('🎊 AdMob: Ready to show ads!');
       return true;
 
     } catch (error) {
       console.error('❌ AdMob: Initialization failed:', error);
+      console.error('💡 AdMob: Check Android configuration files!');
       this.isInitialized = false;
       return false;
     }
@@ -66,7 +75,9 @@ export class AdMobInitService {
   }
 
   isReady(): boolean {
-    return this.isInitialized && Capacitor.isNativePlatform();
+    const ready = this.isInitialized && Capacitor.isNativePlatform();
+    console.log('🔍 AdMob Ready Check:', ready);
+    return ready;
   }
 }
 

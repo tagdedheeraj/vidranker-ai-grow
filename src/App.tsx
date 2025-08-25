@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,7 +20,6 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import AppAdsText from "./components/AppAdsText";
 import { unifiedAdMobService } from "./services/unifiedAdMobService";
-import { forceAdMobService } from "./services/forceAdMobService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,23 +63,23 @@ const App = () => {
             } catch (error) {
               console.error("⚠️ Splash screen error:", error);
             }
-          }, 1500);
+          }, 2000);
 
-          // FORCE Initialize AdMob - POWERFUL MODE
+          // Initialize AdMob
           setTimeout(async () => {
             try {
-              console.log("🔥 App: FORCE AdMob initialization starting...");
-              const success = await forceAdMobService.forceInitialize();
+              console.log("🎯 Starting AdMob initialization...");
+              const success = await unifiedAdMobService.initialize();
               
               if (success) {
-                console.log("🎉 App: FORCE AdMob SUCCESS! Ads ready!");
+                console.log("✅ AdMob ready for ads!");
               } else {
-                console.log("❌ App: FORCE AdMob failed");
+                console.log("❌ AdMob initialization failed");
               }
             } catch (error) {
-              console.error("💥 App: FORCE AdMob error:", error);
+              console.error("💥 AdMob error:", error);
             }
-          }, 1000);
+          }, 1500);
         } else {
           console.log("🌐 Web platform - AdMob will be initialized when app runs on mobile");
         }

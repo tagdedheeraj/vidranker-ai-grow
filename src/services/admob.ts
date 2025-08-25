@@ -1,4 +1,3 @@
-
 import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 
@@ -13,22 +12,17 @@ class AdMobService {
     this.isNativePlatform = Capacitor.isNativePlatform();
     console.log('AdMobService: Platform detected:', Capacitor.getPlatform());
     
-    // Add global error handler for JavaScript errors
     this.setupGlobalErrorHandlers();
   }
 
   private setupGlobalErrorHandlers() {
-    // Handle unhandled JavaScript errors
     window.addEventListener('error', (event) => {
       console.error('Global JavaScript error caught:', event.error);
-      // Prevent crash by handling the error gracefully
       event.preventDefault();
     });
 
-    // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection caught:', event.reason);
-      // Prevent crash by handling the rejection gracefully
       event.preventDefault();
     });
   }
@@ -44,22 +38,18 @@ class AdMobService {
     try {
       console.log("AdMobService: Starting optimized initialization...");
       
-      // Reduced delay for faster startup
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Check if service is still valid
       if (this.isDestroyed) {
         console.log("AdMobService: Service destroyed during initialization");
         return;
       }
 
-      // Safe AdMob initialization with timeout
       const initPromise = AdMob.initialize({
-        testingDevices: [], // Empty array for production
-        initializeForTesting: false, // Disabled for live ads
+        testingDevices: [],
+        initializeForTesting: false,
       });
 
-      // Reduced timeout for better performance
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('AdMob initialization timeout')), 8000)
       );
@@ -73,7 +63,6 @@ class AdMobService {
       console.error("AdMobService: Initialization failed (app continues safely):", error);
       this.isInitialized = false;
       this.initializationFailed = true;
-      // Don't throw - let app continue without ads
     }
   }
 
@@ -95,14 +84,13 @@ class AdMobService {
       }
 
       const bannerOptions: BannerAdOptions = {
-        adId: 'ca-app-pub-2211398170597117/2547153500', // Your live banner ad unit
+        adId: 'ca-app-pub-8658337038682012/4284962341',
         adSize: BannerAdSize.BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         margin: 0,
-        isTesting: false // Live ads enabled for domain verification
+        isTesting: false
       };
 
-      // Safe banner display with reduced timeout
       const bannerPromise = AdMob.showBanner(bannerOptions);
       const timeoutPromise = new Promise((_, reject) => 
         setTimeout(() => reject(new Error('Banner timeout')), 6000)
@@ -134,10 +122,9 @@ class AdMobService {
         return false;
       }
 
-      // Safe interstitial preparation with reduced timeout
       const preparePromise = AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-2211398170597117/8371175883', // Your live interstitial ad unit
-        isTesting: false // Live ads enabled for domain verification
+        adId: 'ca-app-pub-8658337038682012/4284962341',
+        isTesting: false
       });
 
       const timeoutPromise = new Promise((_, reject) => 

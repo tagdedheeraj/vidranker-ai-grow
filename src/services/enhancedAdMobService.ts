@@ -10,10 +10,10 @@ class EnhancedAdMobService {
   private isDestroyed = false;
   private bannerShown = false;
 
-  // Your actual AdMob IDs
-  private readonly APP_ID = 'ca-app-pub-2211398170597117~9683407494';
-  private readonly BANNER_ID = 'ca-app-pub-2211398170597117/2547153500';
-  private readonly INTERSTITIAL_ID = 'ca-app-pub-2211398170597117/8371175883';
+  // Updated AdMob IDs
+  private readonly APP_ID = 'ca-app-pub-8658337038682012~3040147524';
+  private readonly BANNER_ID = 'ca-app-pub-8658337038682012/4284962341';
+  private readonly INTERSTITIAL_ID = 'ca-app-pub-8658337038682012/4284962341';
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();
@@ -52,8 +52,8 @@ class EnhancedAdMobService {
       }
 
       const initPromise = AdMob.initialize({
-        testingDevices: [], // Empty for production
-        initializeForTesting: false, // Production mode
+        testingDevices: [],
+        initializeForTesting: false,
       });
 
       const timeoutPromise = new Promise((_, reject) => 

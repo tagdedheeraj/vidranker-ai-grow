@@ -1,7 +1,7 @@
 
 import RawTextResponse from './RawTextResponse';
 
-const APP_ADS_CONTENT = `google.com, pub-2211398170597117, DIRECT, f08c47fec0942fa0`;
+const APP_ADS_CONTENT = `google.com, pub-8658337038682012, DIRECT, f08c47fec0942fa0`;
 
 const AppAdsText = () => {
   return (

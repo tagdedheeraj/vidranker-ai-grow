@@ -20,9 +20,9 @@ const config: CapacitorConfig = {
       useDialog: false
     },
     AdMob: {
-      applicationId: 'ca-app-pub-2211398170597117~9683407494',
-      initializeForTesting: false, // Production mode
-      testDeviceIds: [], // Empty for production
+      applicationId: 'ca-app-pub-8658337038682012~3040147524',
+      initializeForTesting: false,
+      testDeviceIds: [],
       tagForChildDirectedTreatment: false,
       tagForUnderAgeOfConsent: false,
       maxAdContentRating: 'MA'
@@ -34,7 +34,7 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: true,
     captureInput: true,
-    webContentsDebuggingEnabled: false, // Disabled for production
+    webContentsDebuggingEnabled: false,
     loggingBehavior: 'none'
   },
   ios: {

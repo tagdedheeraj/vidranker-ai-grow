@@ -16,10 +16,10 @@ export class AdMobInitService {
 
   private constructor() {
     this.config = {
-      appId: 'ca-app-pub-2211398170597117~9683407494',
-      bannerId: 'ca-app-pub-2211398170597117/2547153500',
-      interstitialId: 'ca-app-pub-2211398170597117/8371175883',
-      isTestMode: false // Production mode
+      appId: 'ca-app-pub-8658337038682012~3040147524',
+      bannerId: 'ca-app-pub-8658337038682012/4284962341',
+      interstitialId: 'ca-app-pub-8658337038682012/4284962341',
+      isTestMode: false
     };
   }
 
@@ -51,10 +51,9 @@ export class AdMobInitService {
       console.log('🎯 Banner ID:', this.config.bannerId);
       console.log('📺 Interstitial ID:', this.config.interstitialId);
 
-      // Initialize with production settings
       await AdMob.initialize({
-        testingDevices: [], // Empty for production
-        initializeForTesting: false, // Production mode
+        testingDevices: [],
+        initializeForTesting: false,
       });
 
       this.isInitialized = true;

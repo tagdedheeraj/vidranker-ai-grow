@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAdMobService } from '../hooks/useAdMobService';
-import { RefreshCw, Eye, EyeOff, Smartphone, Wifi, AlertCircle } from 'lucide-react';
+import { RefreshCw, Eye, EyeOff, Smartphone, Wifi, AlertCircle, Play } from 'lucide-react';
 import { BannerAdPosition } from '@capacitor-community/admob';
+import { adTriggerService } from '../services/adTriggerService';
+import { useEffect } from 'react';
 
 const AdMobStatus = () => {
   const { 
@@ -19,12 +21,19 @@ const AdMobStatus = () => {
     isNativePlatform
   } = useAdMobService();
 
+  useEffect(() => {
+    // Set up ad trigger service when component mounts
+    adTriggerService.setAdMobService({ isReady, showBanner, showInterstitial, isNativePlatform });
+  }, [isReady, showBanner, showInterstitial, isNativePlatform]);
+
   const handleShowBanner = async () => {
-    await showBanner(BannerAdPosition.BOTTOM_CENTER);
+    const success = await adTriggerService.showBannerOnPageLoad();
+    console.log('🎯 AdMobStatus: Banner trigger result:', success);
   };
 
   const handleShowInterstitial = async () => {
-    await showInterstitial();
+    const success = await adTriggerService.showInterstitialOnAction('manual_test');
+    console.log('🎯 AdMobStatus: Interstitial trigger result:', success);
   };
 
   const handleHideBanner = async () => {
@@ -84,11 +93,11 @@ const AdMobStatus = () => {
                 </div>
               </div>
 
-              {/* Control Buttons */}
-              <div className="flex flex-wrap gap-2">
+              {/* Enhanced Control Buttons */}
+              <div className="grid grid-cols-2 gap-2">
                 <Button 
                   onClick={handleShowBanner} 
-                  disabled={!isReady || bannerShown || isInitializing}
+                  disabled={!isReady || isInitializing}
                   size="sm"
                   className="flex items-center gap-2"
                 >
@@ -110,9 +119,22 @@ const AdMobStatus = () => {
                   disabled={!isReady || isInitializing}
                   variant="secondary"
                   size="sm"
+                  className="col-span-2"
                 >
-                  📺 Show Interstitial
+                  <Play className="w-4 h-4 mr-2" />
+                  Show Interstitial Ad
                 </Button>
+              </div>
+
+              {/* Status Information */}
+              <div className="bg-muted p-3 rounded-lg text-sm">
+                <div className="font-medium mb-2">Real-time Status:</div>
+                <div className="space-y-1">
+                  <div>🔄 Initialization: {isReady ? 'Complete' : 'Pending'}</div>
+                  <div>📱 Platform: {isNativePlatform ? 'Native Mobile' : 'Web Browser'}</div>
+                  <div>🎯 Banner Status: {bannerShown ? 'Currently Showing' : 'Hidden/Not Loaded'}</div>
+                  <div>⚡ Ready for Ads: {isReady && isNativePlatform ? 'Yes' : 'No'}</div>
+                </div>
               </div>
             </div>
           ) : (

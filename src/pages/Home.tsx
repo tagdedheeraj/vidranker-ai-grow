@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,9 @@ import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-r
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
 import { useAdMobService } from "@/hooks/useAdMobService";
+import AdBanner from "@/components/AdBanner";
+import AdInterstitial from "@/components/AdInterstitial";
+import { adTriggerService } from "@/services/adTriggerService";
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
@@ -16,16 +20,22 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
-    // Show banner ad when component mounts and AdMob is ready
+    // Set up ad trigger service
+    adTriggerService.setAdMobService({ isReady, showBanner, showInterstitial, isNativePlatform });
+    
+    // Show banner when page loads and AdMob is ready
     if (isReady && isNativePlatform) {
-      showBanner();
+      console.log('🏠 Home: AdMob ready, triggering banner...');
+      adTriggerService.showBannerOnPageLoad();
     }
-  }, [isReady, showBanner, isNativePlatform]);
+  }, [isReady, showBanner, showInterstitial, isNativePlatform]);
 
-  const handleFeatureClick = async (href: string) => {
+  const handleFeatureClick = async (href: string, featureName: string) => {
+    console.log(`🎯 Home: User clicked ${featureName}, showing interstitial...`);
+    
     // Show interstitial ad when user navigates to a feature
     if (isReady && isNativePlatform) {
-      await showInterstitial();
+      await adTriggerService.showInterstitialOnAction(`feature_click_${featureName}`);
     }
   };
 
@@ -60,11 +70,14 @@ const Home = () => {
 
   return (
     <div className="space-y-8 pb-20 md:pb-8">
+      {/* AdMob Banner Component */}
+      <AdBanner autoShow={true} />
+
       {/* AdMob Error Display */}
       {error && (
         <Card className="border-red-200 bg-red-50">
           <CardContent className="pt-4">
-            <p className="text-red-600 text-sm">⚠️ {error}</p>
+            <p className="text-red-600 text-sm">⚠️ AdMob Error: {error}</p>
           </CardContent>
         </Card>
       )}
@@ -100,7 +113,7 @@ const Home = () => {
                 <Link key={action.name} to={action.href}>
                   <Button 
                     className={`${action.color} hover:opacity-90 text-white`}
-                    onClick={() => handleFeatureClick(action.href)}
+                    onClick={() => handleFeatureClick(action.href, action.name)}
                   >
                     <Icon className="w-4 h-4 mr-2" />
                     {action.name}
@@ -144,6 +157,39 @@ const Home = () => {
         </Card>
       </div>
 
+      {/* Ad Test Section - Only show on native platform */}
+      {isNativePlatform && (
+        <Card className="glass border-2 border-green-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-green-600">
+              <Play className="w-5 h-5" />
+              Test Ads (Mobile Only)
+            </CardTitle>
+            <CardDescription>
+              Test banner and interstitial ads on your mobile device
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-4">
+              <Button 
+                onClick={() => adTriggerService.showBannerOnPageLoad()}
+                disabled={!isReady}
+                variant="outline"
+                className="flex-1"
+              >
+                Show Banner
+              </Button>
+              <AdInterstitial 
+                onAdClosed={() => console.log('✅ Interstitial closed')}
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              Status: {isReady ? '✅ Ready to show ads' : '❌ AdMob not ready'}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Features Grid */}
       <div>
         <h2 className="text-2xl font-bold mb-6">Features</h2>
@@ -152,7 +198,10 @@ const Home = () => {
             const Icon = feature.icon;
             return (
               <Link key={feature.title} to={feature.href}>
-                <Card className="glass hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                <Card 
+                  className="glass hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                  onClick={() => handleFeatureClick(feature.href, feature.title)}
+                >
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <Icon className={`w-8 h-8 ${feature.color}`} />

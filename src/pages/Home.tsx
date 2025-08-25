@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,37 +5,28 @@ import { Link } from "react-router-dom";
 import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-react";
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
-import { useAdMobService } from "@/hooks/useAdMobService";
-import AdBanner from "@/components/AdBanner";
-import AdInterstitial from "@/components/AdInterstitial";
-import { adTriggerService } from "@/services/adTriggerService";
+import { useAdMob } from "@/hooks/useAdMob";
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
-  const { isReady, showBanner, showInterstitial, error, isNativePlatform } = useAdMobService();
+  const { isReady, bannerShown, error, showBanner, showInterstitial, status } = useAdMob();
 
   useEffect(() => {
     setSavedCount(getSavedContent().length);
   }, []);
 
+  // Auto-show banner when ready
   useEffect(() => {
-    // Set up ad trigger service
-    adTriggerService.setAdMobService({ isReady, showBanner, showInterstitial, isNativePlatform });
-    
-    // Show banner when page loads and AdMob is ready
-    if (isReady && isNativePlatform) {
-      console.log('🏠 Home: AdMob ready, triggering banner...');
-      adTriggerService.showBannerOnPageLoad();
+    if (isReady && status.isNativePlatform && !bannerShown) {
+      console.log('🏠 Home: Auto-showing banner...');
+      showBanner();
     }
-  }, [isReady, showBanner, showInterstitial, isNativePlatform]);
+  }, [isReady, bannerShown, showBanner, status.isNativePlatform]);
 
-  const handleFeatureClick = async (href: string, featureName: string) => {
-    console.log(`🎯 Home: User clicked ${featureName}, showing interstitial...`);
-    
-    // Show interstitial ad when user navigates to a feature
-    if (isReady && isNativePlatform) {
-      await adTriggerService.showInterstitialOnAction(`feature_click_${featureName}`);
-    }
+  const handleInterstitialClick = async () => {
+    console.log('🎯 Home: Manual interstitial click');
+    const success = await showInterstitial();
+    console.log('🎯 Home: Interstitial result:', success);
   };
 
   const features = [
@@ -70,24 +60,24 @@ const Home = () => {
 
   return (
     <div className="space-y-8 pb-20 md:pb-8">
-      {/* AdMob Banner Component */}
-      <AdBanner autoShow={true} />
-
-      {/* AdMob Error Display */}
-      {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="pt-4">
-            <p className="text-red-600 text-sm">⚠️ AdMob Error: {error}</p>
-          </CardContent>
-        </Card>
+      {/* AdMob Status Display */}
+      {status.isNativePlatform && (
+        <div className="bg-green-100 p-4 rounded-lg">
+          <div className="text-sm space-y-1">
+            <div>🎯 AdMob Status: {isReady ? '✅ Ready' : '❌ Not Ready'}</div>
+            <div>📱 Platform: {status.isNativePlatform ? 'Native' : 'Web'}</div>
+            <div>🎞️ Banner: {bannerShown ? '✅ Showing' : '❌ Hidden'}</div>
+            {error && <div className="text-red-600">❌ Error: {error}</div>}
+          </div>
+        </div>
       )}
 
-      {/* Platform Notice for Web Users */}
-      {!isNativePlatform && (
+      {/* Web Notice */}
+      {!status.isNativePlatform && (
         <Card className="border-blue-200 bg-blue-50">
           <CardContent className="pt-4">
             <p className="text-blue-600 text-sm">
-              🌐 You're viewing the web version. Download the mobile app to see ads and get the full experience!
+              🌐 Web version - Ads will show when you build and run on Android device
             </p>
           </CardContent>
         </Card>
@@ -111,10 +101,7 @@ const Home = () => {
               const Icon = action.icon;
               return (
                 <Link key={action.name} to={action.href}>
-                  <Button 
-                    className={`${action.color} hover:opacity-90 text-white`}
-                    onClick={() => handleFeatureClick(action.href, action.name)}
-                  >
+                  <Button className={`${action.color} hover:opacity-90 text-white`}>
                     <Icon className="w-4 h-4 mr-2" />
                     {action.name}
                   </Button>
@@ -148,43 +135,37 @@ const Home = () => {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-primary">
-              {isNativePlatform ? (isReady ? '✅' : '❌') : '🌐'}
+              {isReady ? '✅' : '❌'}
             </div>
-            <div className="text-sm text-muted-foreground">
-              {isNativePlatform ? 'AdMob' : 'Web'}
-            </div>
+            <div className="text-sm text-muted-foreground">AdMob</div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Ad Test Section - Only show on native platform */}
-      {isNativePlatform && (
-        <Card className="glass border-2 border-green-200">
+      {/* Ad Test Section - Only on native */}
+      {status.isNativePlatform && (
+        <Card className="border-2 border-green-200 bg-green-50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-600">
-              <Play className="w-5 h-5" />
-              Test Ads (Mobile Only)
-            </CardTitle>
-            <CardDescription>
-              Test banner and interstitial ads on your mobile device
-            </CardDescription>
+            <CardTitle className="text-green-600">🎯 Test Ads</CardTitle>
+            <CardDescription>Test your AdMob integration</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4">
               <Button 
-                onClick={() => adTriggerService.showBannerOnPageLoad()}
+                onClick={showBanner}
                 disabled={!isReady}
-                variant="outline"
                 className="flex-1"
               >
                 Show Banner
               </Button>
-              <AdInterstitial 
-                onAdClosed={() => console.log('✅ Interstitial closed')}
-              />
-            </div>
-            <div className="text-sm text-muted-foreground">
-              Status: {isReady ? '✅ Ready to show ads' : '❌ AdMob not ready'}
+              <Button 
+                onClick={handleInterstitialClick}
+                disabled={!isReady}
+                variant="secondary"
+                className="flex-1"
+              >
+                Show Interstitial
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -198,10 +179,7 @@ const Home = () => {
             const Icon = feature.icon;
             return (
               <Link key={feature.title} to={feature.href}>
-                <Card 
-                  className="glass hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                  onClick={() => handleFeatureClick(feature.href, feature.title)}
-                >
+                <Card className="glass hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                   <CardHeader>
                     <div className="flex items-center gap-3">
                       <Icon className={`w-8 h-8 ${feature.color}`} />

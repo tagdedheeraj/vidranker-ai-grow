@@ -1,87 +1,73 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { enhancedAdMobService } from '../services/enhancedAdMobService';
-import { BannerAdPosition } from '@capacitor-community/admob';
+import { adMobService } from '../services/adMobService';
 
 export const useAdMob = () => {
   const [isReady, setIsReady] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false);
   const [bannerShown, setBannerShown] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const initializeAdMob = async () => {
-      if (enhancedAdMobService.isReady()) {
-        setIsReady(true);
-        return;
-      }
-
-      setIsInitializing(true);
-      setError(null);
-
+    const initAds = async () => {
       try {
-        const success = await enhancedAdMobService.initialize();
+        console.log('🔄 useAdMob: Initializing AdMob...');
+        const success = await adMobService.initialize();
         setIsReady(success);
-        if (!success) {
+        
+        if (success) {
+          console.log('✅ useAdMob: AdMob ready!');
+          setError(null);
+        } else {
           setError('AdMob initialization failed');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown AdMob error');
+        console.error('❌ useAdMob: Error:', err);
+        setError('AdMob error occurred');
         setIsReady(false);
-      } finally {
-        setIsInitializing(false);
       }
     };
 
-    initializeAdMob();
+    initAds();
   }, []);
 
-  const showBanner = useCallback(async (position?: BannerAdPosition) => {
-    if (!isReady) return false;
-    
+  const showBanner = useCallback(async () => {
     try {
-      const success = await enhancedAdMobService.showBanner(position);
+      const success = await adMobService.loadAndShowBanner();
       setBannerShown(success);
       return success;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Banner show failed');
+      console.error('❌ useAdMob: Banner error:', err);
+      setError('Banner show failed');
       return false;
-    }
-  }, [isReady]);
-
-  const showInterstitial = useCallback(async () => {
-    if (!isReady) return false;
-    
-    try {
-      return await enhancedAdMobService.showInterstitial();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Interstitial show failed');
-      return false;
-    }
-  }, [isReady]);
-
-  const hideBanner = useCallback(async () => {
-    try {
-      await enhancedAdMobService.hideBanner();
-      setBannerShown(false);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Banner hide failed');
     }
   }, []);
 
-  const showInterstitialAfterDelay = useCallback((delayMs?: number) => {
-    enhancedAdMobService.showInterstitialAfterDelay(delayMs);
+  const showInterstitial = useCallback(async () => {
+    try {
+      return await adMobService.loadAndShowInterstitial();
+    } catch (err) {
+      console.error('❌ useAdMob: Interstitial error:', err);
+      setError('Interstitial show failed');
+      return false;
+    }
+  }, []);
+
+  const hideBanner = useCallback(async () => {
+    try {
+      await adMobService.hideBanner();
+      setBannerShown(false);
+    } catch (err) {
+      console.error('❌ useAdMob: Hide banner error:', err);
+    }
   }, []);
 
   return {
     isReady,
-    isInitializing,
     bannerShown,
     error,
     showBanner,
     showInterstitial,
     hideBanner,
-    showInterstitialAfterDelay,
-    getStatus: () => enhancedAdMobService.getStatus()
+    status: adMobService.getStatus()
   };
 };

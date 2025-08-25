@@ -19,6 +19,7 @@ import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import { enhancedAdMobService } from "./services/enhancedAdMobService";
 import AppAdsText from "./components/AppAdsText";
+import { adMobService } from "./services/adMobService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,8 +29,6 @@ const queryClient = new QueryClient({
     },
   },
 });
-
-import { adMobInit } from "./services/adMobInit";
 
 const App = () => {
   useEffect(() => {
@@ -70,7 +69,7 @@ const App = () => {
           setTimeout(async () => {
             try {
               console.log("🎯 Starting AdMob initialization...");
-              const success = await adMobInit.initialize();
+              const success = await adMobService.initialize();
               
               if (success) {
                 console.log("✅ AdMob ready for production ads!");

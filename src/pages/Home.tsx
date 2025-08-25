@@ -5,28 +5,26 @@ import { Link } from "react-router-dom";
 import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-react";
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
-import { useAdMob } from "@/hooks/useAdMob";
+import { useUnifiedAdMob } from "@/hooks/useUnifiedAdMob";
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
-  const { isReady, bannerShown, error, showBanner, showInterstitial, status } = useAdMob();
+  const { isReady, bannerShown, error, showBanner, showInterstitial, status } = useUnifiedAdMob();
 
   useEffect(() => {
     setSavedCount(getSavedContent().length);
   }, []);
 
-  // Auto-show banner when ready
-  useEffect(() => {
-    if (isReady && status.isNativePlatform && !bannerShown) {
-      console.log('🏠 Home: Auto-showing banner...');
-      showBanner();
-    }
-  }, [isReady, bannerShown, showBanner, status.isNativePlatform]);
+  const handleBannerClick = async () => {
+    console.log('🎯 Manual banner click');
+    const success = await showBanner();
+    console.log('🎯 Banner result:', success);
+  };
 
   const handleInterstitialClick = async () => {
-    console.log('🎯 Home: Manual interstitial click');
+    console.log('🎯 Manual interstitial click');
     const success = await showInterstitial();
-    console.log('🎯 Home: Interstitial result:', success);
+    console.log('🎯 Interstitial result:', success);
   };
 
   const features = [
@@ -68,6 +66,25 @@ const Home = () => {
             <div>📱 Platform: {status.isNativePlatform ? 'Native' : 'Web'}</div>
             <div>🎞️ Banner: {bannerShown ? '✅ Showing' : '❌ Hidden'}</div>
             {error && <div className="text-red-600">❌ Error: {error}</div>}
+          </div>
+          
+          {/* Test Buttons */}
+          <div className="flex gap-2 mt-4">
+            <Button 
+              onClick={handleBannerClick}
+              disabled={!isReady}
+              size="sm"
+            >
+              Load Banner Ad
+            </Button>
+            <Button 
+              onClick={handleInterstitialClick}
+              disabled={!isReady}
+              variant="secondary"
+              size="sm"
+            >
+              Load Interstitial Ad
+            </Button>
           </div>
         </div>
       )}
@@ -141,35 +158,6 @@ const Home = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Ad Test Section - Only on native */}
-      {status.isNativePlatform && (
-        <Card className="border-2 border-green-200 bg-green-50">
-          <CardHeader>
-            <CardTitle className="text-green-600">🎯 Test Ads</CardTitle>
-            <CardDescription>Test your AdMob integration</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex gap-4">
-              <Button 
-                onClick={showBanner}
-                disabled={!isReady}
-                className="flex-1"
-              >
-                Show Banner
-              </Button>
-              <Button 
-                onClick={handleInterstitialClick}
-                disabled={!isReady}
-                variant="secondary"
-                className="flex-1"
-              >
-                Show Interstitial
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Features Grid */}
       <div>

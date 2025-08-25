@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,9 +18,8 @@ import Settings from "./pages/Settings";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
-import { enhancedAdMobService } from "./services/enhancedAdMobService";
 import AppAdsText from "./components/AppAdsText";
-import { adMobService } from "./services/adMobService";
+import { unifiedAdMobService } from "./services/unifiedAdMobService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,14 +65,14 @@ const App = () => {
             }
           }, 2000);
 
-          // Initialize AdMob with new service
+          // Initialize AdMob
           setTimeout(async () => {
             try {
               console.log("🎯 Starting AdMob initialization...");
-              const success = await adMobService.initialize();
+              const success = await unifiedAdMobService.initialize();
               
               if (success) {
-                console.log("✅ AdMob ready for production ads!");
+                console.log("✅ AdMob ready for ads!");
               } else {
                 console.log("❌ AdMob initialization failed");
               }

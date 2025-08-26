@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { unifiedAdMobService } from '../services/unifiedAdMobService';
+import { facebookAdsService } from '../services/facebookAdsService';
 
-export const useUnifiedAdMob = () => {
+export const useFacebookAds = () => {
   const [isReady, setIsReady] = useState(false);
   const [bannerShown, setBannerShown] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -10,23 +10,23 @@ export const useUnifiedAdMob = () => {
   useEffect(() => {
     const initAds = async () => {
       try {
-        console.log('🔄 Starting AdMob initialization...');
-        const success = await unifiedAdMobService.initialize();
+        console.log('🔄 Starting Facebook Ads initialization...');
+        const success = await facebookAdsService.initialize();
         setIsReady(success);
         
         if (success) {
-          console.log('✅ AdMob ready!');
+          console.log('✅ Facebook Ads ready!');
           setError(null);
           
           // Check banner status
-          const status = unifiedAdMobService.getStatus();
+          const status = facebookAdsService.getStatus();
           setBannerShown(status.bannerShown);
         } else {
-          setError('AdMob initialization failed');
+          setError('Facebook Ads initialization failed');
         }
       } catch (err) {
-        console.error('❌ AdMob Error:', err);
-        setError('AdMob error occurred');
+        console.error('❌ Facebook Ads Error:', err);
+        setError('Facebook Ads error occurred');
         setIsReady(false);
       }
     };
@@ -36,7 +36,7 @@ export const useUnifiedAdMob = () => {
 
   const showBanner = useCallback(async () => {
     try {
-      const success = await unifiedAdMobService.showBanner();
+      const success = await facebookAdsService.showBanner();
       setBannerShown(success);
       return success;
     } catch (err) {
@@ -48,7 +48,7 @@ export const useUnifiedAdMob = () => {
 
   const showInterstitial = useCallback(async () => {
     try {
-      return await unifiedAdMobService.showInterstitial();
+      return await facebookAdsService.showInterstitial();
     } catch (err) {
       console.error('❌ Interstitial error:', err);
       setError('Interstitial show failed');
@@ -58,14 +58,14 @@ export const useUnifiedAdMob = () => {
 
   const hideBanner = useCallback(async () => {
     try {
-      await unifiedAdMobService.hideBanner();
+      await facebookAdsService.hideBanner();
       setBannerShown(false);
     } catch (err) {
       console.error('❌ Hide banner error:', err);
     }
   }, []);
 
-  const status = unifiedAdMobService.getStatus();
+  const status = facebookAdsService.getStatus();
 
   return {
     isReady,

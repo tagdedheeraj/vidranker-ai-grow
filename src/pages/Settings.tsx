@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
 import { ExternalLink, Shield, FileText, Smartphone, Settings as SettingsIcon } from "lucide-react";
-import AdMobStatus from "@/components/AdMobStatus";
+import FacebookAdsStatus from "@/components/FacebookAdsStatus";
 
 const Settings = () => {
   const appVersion = "1.0.0";
@@ -19,8 +19,8 @@ const Settings = () => {
         </p>
       </div>
 
-      {/* AdMob Status & Controls */}
-      <AdMobStatus />
+      {/* Facebook Ads Status & Controls */}
+      <FacebookAdsStatus />
 
       {/* App Information */}
       <Card className="glass">

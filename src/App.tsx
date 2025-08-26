@@ -19,7 +19,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import AppAdsText from "./components/AppAdsText";
-import { unifiedAdMobService } from "./services/unifiedAdMobService";
+import FacebookBanner from "./components/FacebookBanner";
+import { facebookAdsService } from "./services/facebookAdsService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,7 +51,7 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("🚀 VidRanker Starting - Production Mode");
+        console.log("🚀 VidRanker Starting - Facebook Ads Mode");
         console.log("📱 Platform:", Capacitor.getPlatform());
         console.log("🔧 Native Platform:", Capacitor.isNativePlatform());
         
@@ -65,23 +66,23 @@ const App = () => {
             }
           }, 2000);
 
-          // Initialize AdMob
+          // Initialize Facebook Ads
           setTimeout(async () => {
             try {
-              console.log("🎯 Starting AdMob initialization...");
-              const success = await unifiedAdMobService.initialize();
+              console.log("🎯 Starting Facebook Ads initialization...");
+              const success = await facebookAdsService.initialize();
               
               if (success) {
-                console.log("✅ AdMob ready for ads!");
+                console.log("✅ Facebook Ads ready!");
               } else {
-                console.log("❌ AdMob initialization failed");
+                console.log("❌ Facebook Ads initialization failed");
               }
             } catch (error) {
-              console.error("💥 AdMob error:", error);
+              console.error("💥 Facebook Ads error:", error);
             }
           }, 1500);
         } else {
-          console.log("🌐 Web platform - AdMob will be initialized when app runs on mobile");
+          console.log("🌐 Web platform - Facebook Ads will be initialized when app runs on mobile");
         }
         
       } catch (error) {
@@ -118,6 +119,7 @@ const App = () => {
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>
+                    <FacebookBanner />
                     <BottomNavigation />
                   </>
                 } />

@@ -19,13 +19,10 @@ const config: CapacitorConfig = {
       layoutName: 'launch_screen',
       useDialog: false
     },
-    AdMob: {
-      applicationId: 'ca-app-pub-8658337038682012~3040147524',
-      initializeForTesting: false,
-      testDeviceIds: [],
-      tagForChildDirectedTreatment: false,
-      tagForUnderAgeOfConsent: false,
-      maxAdContentRating: 'MA'
+    FacebookAds: {
+      appId: '1160387479246621',
+      testMode: false,
+      tagForChildDirectedTreatment: false
     },
     CapacitorHttp: {
       enabled: true

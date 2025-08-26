@@ -1,35 +1,35 @@
 
 import { Button } from '@/components/ui/button';
-import { useAdMobService } from '../hooks/useAdMobService';
+import { useFacebookAds } from '../hooks/useFacebookAds';
 import { Play, Zap } from 'lucide-react';
 
-interface AdInterstitialProps {
+interface FacebookInterstitialProps {
   onAdClosed?: () => void;
   trigger?: 'button' | 'auto';
   delay?: number;
 }
 
-const AdInterstitial = ({ onAdClosed, trigger = 'button', delay = 0 }: AdInterstitialProps) => {
-  const { isReady, showInterstitial, error, isNativePlatform } = useAdMobService();
+const FacebookInterstitial = ({ onAdClosed, trigger = 'button', delay = 0 }: FacebookInterstitialProps) => {
+  const { isReady, showInterstitial, error, status } = useFacebookAds();
 
   const handleShowAd = async () => {
-    if (!isReady || !isNativePlatform) {
-      console.log('❌ AdInterstitial: Not ready or not native platform');
+    if (!isReady || !status.isNativePlatform) {
+      console.log('❌ FacebookInterstitial: Not ready or not native platform');
       return;
     }
 
     try {
-      console.log('🎯 AdInterstitial: Showing interstitial ad...');
+      console.log('🎯 FacebookInterstitial: Showing interstitial ad...');
       const success = await showInterstitial();
       
       if (success) {
-        console.log('✅ AdInterstitial: Ad shown successfully');
+        console.log('✅ FacebookInterstitial: Ad shown successfully');
         onAdClosed?.();
       } else {
-        console.log('❌ AdInterstitial: Failed to show ad');
+        console.log('❌ FacebookInterstitial: Failed to show ad');
       }
     } catch (err) {
-      console.error('💥 AdInterstitial Error:', err);
+      console.error('💥 FacebookInterstitial Error:', err);
     }
   };
 
@@ -38,10 +38,10 @@ const AdInterstitial = ({ onAdClosed, trigger = 'button', delay = 0 }: AdInterst
     return null;
   }
 
-  if (!isNativePlatform) {
+  if (!status.isNativePlatform) {
     return (
       <Button variant="outline" disabled>
-        🌐 Interstitial (Mobile Only)
+        🌐 Facebook Ad (Mobile Only)
       </Button>
     );
   }
@@ -50,12 +50,12 @@ const AdInterstitial = ({ onAdClosed, trigger = 'button', delay = 0 }: AdInterst
     <Button 
       onClick={handleShowAd} 
       disabled={!isReady}
-      className="bg-green-500 hover:bg-green-600 text-white"
+      className="bg-blue-500 hover:bg-blue-600 text-white"
     >
       {isReady ? (
         <>
           <Play className="w-4 h-4 mr-2" />
-          Show Ad
+          Show Facebook Ad
         </>
       ) : (
         <>
@@ -67,4 +67,4 @@ const AdInterstitial = ({ onAdClosed, trigger = 'button', delay = 0 }: AdInterst
   );
 };
 
-export default AdInterstitial;
+export default FacebookInterstitial;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Copy, Search, Sparkles, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useAdMob } from "@/hooks/useAdMob";
+import { useFacebookAds } from "@/hooks/useFacebookAds";
 
 const SEOGenerator = () => {
   const [keyword, setKeyword] = useState("");
@@ -18,7 +17,7 @@ const SEOGenerator = () => {
     description: string;
   } | null>(null);
 
-  const { isReady, showInterstitial } = useAdMob();
+  const { isReady, showInterstitial } = useFacebookAds();
 
   const saveToHistory = (data: { tags: string[]; title: string; description: string; keyword: string }) => {
     try {

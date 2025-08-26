@@ -3,37 +3,28 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAdMobService } from '../hooks/useAdMobService';
-import { RefreshCw, Eye, EyeOff, Smartphone, Wifi, AlertCircle, Play } from 'lucide-react';
-import { BannerAdPosition } from '@capacitor-community/admob';
-import { adTriggerService } from '../services/adTriggerService';
-import { useEffect } from 'react';
+import { useFacebookAds } from '../hooks/useFacebookAds';
+import { RefreshCw, Eye, EyeOff, Smartphone, AlertCircle, Play } from 'lucide-react';
 
 const AdMobStatus = () => {
   const { 
     isReady, 
-    isInitializing, 
     bannerShown, 
     error, 
     showBanner, 
     showInterstitial, 
     hideBanner,
-    isNativePlatform
-  } = useAdMobService();
-
-  useEffect(() => {
-    // Set up ad trigger service when component mounts
-    adTriggerService.setAdMobService({ isReady, showBanner, showInterstitial, isNativePlatform });
-  }, [isReady, showBanner, showInterstitial, isNativePlatform]);
+    status
+  } = useFacebookAds();
 
   const handleShowBanner = async () => {
-    const success = await adTriggerService.showBannerOnPageLoad();
-    console.log('🎯 AdMobStatus: Banner trigger result:', success);
+    const success = await showBanner();
+    console.log('🎯 Facebook Banner trigger result:', success);
   };
 
   const handleShowInterstitial = async () => {
-    const success = await adTriggerService.showInterstitialOnAction('manual_test');
-    console.log('🎯 AdMobStatus: Interstitial trigger result:', success);
+    const success = await showInterstitial();
+    console.log('🎯 Facebook Interstitial trigger result:', success);
   };
 
   const handleHideBanner = async () => {
@@ -46,20 +37,20 @@ const AdMobStatus = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="w-5 h-5" />
-            AdMob Status & Controls
+            Facebook Ads Status & Controls
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Status Badges */}
           <div className="flex flex-wrap gap-2">
-            <Badge variant={isNativePlatform ? "default" : "secondary"}>
-              {isNativePlatform ? "📱 Native App" : "🌐 Web Browser"}
+            <Badge variant={status.isNativePlatform ? "default" : "secondary"}>
+              {status.isNativePlatform ? "📱 Native App" : "🌐 Web Browser"}
             </Badge>
             <Badge variant={isReady ? "default" : "destructive"}>
-              {isReady ? "✅ AdMob Ready" : "❌ Not Ready"}
+              {isReady ? "✅ Facebook Ads Ready" : "❌ Not Ready"}
             </Badge>
-            <Badge variant={isInitializing ? "default" : "secondary"}>
-              {isInitializing ? "🔄 Initializing" : "⏸️ Idle"}
+            <Badge variant={status.isInitializing ? "default" : "secondary"}>
+              {status.isInitializing ? "🔄 Initializing" : "⏸️ Idle"}
             </Badge>
             <Badge variant={bannerShown ? "default" : "secondary"}>
               {bannerShown ? "👁️ Banner Active" : "👁️‍🗨️ Banner Hidden"}
@@ -77,19 +68,18 @@ const AdMobStatus = () => {
           )}
 
           {/* Platform-specific Content */}
-          {isNativePlatform ? (
+          {status.isNativePlatform ? (
             <div className="space-y-4">
               {/* Ad Unit Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="space-y-2">
                   <div className="font-medium">App Configuration:</div>
-                  <div>App ID: ca-app-pub-2211398170597117~9683407494</div>
+                  <div>App ID: 1160387479246621</div>
                   <div>Mode: Production</div>
                 </div>
                 <div className="space-y-2">
                   <div className="font-medium">Ad Units:</div>
-                  <div>Banner: ca-app-pub-2211398170597117/2547153500</div>
-                  <div>Interstitial: ca-app-pub-2211398170597117/8371175883</div>
+                  <div>Interstitial: 1160387479246621_1161152762503426</div>
                 </div>
               </div>
 
@@ -97,7 +87,7 @@ const AdMobStatus = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Button 
                   onClick={handleShowBanner} 
-                  disabled={!isReady || isInitializing}
+                  disabled={!isReady || status.isInitializing}
                   size="sm"
                   className="flex items-center gap-2"
                 >
@@ -116,7 +106,7 @@ const AdMobStatus = () => {
                 </Button>
                 <Button 
                   onClick={handleShowInterstitial} 
-                  disabled={!isReady || isInitializing}
+                  disabled={!isReady || status.isInitializing}
                   variant="secondary"
                   size="sm"
                   className="col-span-2"
@@ -131,9 +121,9 @@ const AdMobStatus = () => {
                 <div className="font-medium mb-2">Real-time Status:</div>
                 <div className="space-y-1">
                   <div>🔄 Initialization: {isReady ? 'Complete' : 'Pending'}</div>
-                  <div>📱 Platform: {isNativePlatform ? 'Native Mobile' : 'Web Browser'}</div>
+                  <div>📱 Platform: {status.isNativePlatform ? 'Native Mobile' : 'Web Browser'}</div>
                   <div>🎯 Banner Status: {bannerShown ? 'Currently Showing' : 'Hidden/Not Loaded'}</div>
-                  <div>⚡ Ready for Ads: {isReady && isNativePlatform ? 'Yes' : 'No'}</div>
+                  <div>⚡ Ready for Ads: {isReady && status.isNativePlatform ? 'Yes' : 'No'}</div>
                 </div>
               </div>
             </div>
@@ -142,7 +132,7 @@ const AdMobStatus = () => {
               <Smartphone className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-2">
-                  <div className="font-medium">AdMob requires Native Mobile App</div>
+                  <div className="font-medium">Facebook Ads requires Native Mobile App</div>
                   <div className="text-sm">
                     To see ads, you need to:
                   </div>

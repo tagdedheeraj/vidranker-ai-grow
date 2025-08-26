@@ -123,7 +123,7 @@ class AdMobService {
       }
 
       const preparePromise = AdMob.prepareInterstitial({
-        adId: 'ca-app-pub-8658337038682012/4284962341',
+        adId: 'ca-app-pub-8658337038682012/8733110296',
         isTesting: false
       });
 

@@ -1,4 +1,3 @@
-
 import { AdMob, BannerAdOptions, BannerAdSize, BannerAdPosition } from '@capacitor-community/admob';
 import { Capacitor } from '@capacitor/core';
 
@@ -13,7 +12,7 @@ class EnhancedAdMobService {
   // Updated AdMob IDs
   private readonly APP_ID = 'ca-app-pub-8658337038682012~3040147524';
   private readonly BANNER_ID = 'ca-app-pub-8658337038682012/4284962341';
-  private readonly INTERSTITIAL_ID = 'ca-app-pub-8658337038682012/4284962341';
+  private readonly INTERSTITIAL_ID = 'ca-app-pub-8658337038682012/8733110296';
 
   constructor() {
     this.isNativePlatform = Capacitor.isNativePlatform();

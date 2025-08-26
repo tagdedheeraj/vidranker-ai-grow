@@ -9,7 +9,7 @@ class UnifiedAdMobService {
   // Updated AdMob IDs
   private readonly APP_ID = 'ca-app-pub-8658337038682012~3040147524';
   private readonly BANNER_ID = 'ca-app-pub-8658337038682012/4284962341';
-  private readonly INTERSTITIAL_ID = 'ca-app-pub-8658337038682012/4284962341';
+  private readonly INTERSTITIAL_ID = 'ca-app-pub-8658337038682012/8733110296';
 
   async initialize(): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) {

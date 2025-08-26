@@ -49,8 +49,8 @@ const AdMobStatus = () => {
             <Badge variant={isReady ? "default" : "destructive"}>
               {isReady ? "✅ Facebook Ads Ready" : "❌ Not Ready"}
             </Badge>
-            <Badge variant={status.isInitializing ? "default" : "secondary"}>
-              {status.isInitializing ? "🔄 Initializing" : "⏸️ Idle"}
+            <Badge variant={status.isInitialized ? "default" : "secondary"}>
+              {status.isInitialized ? "✅ Initialized" : "🔄 Not Initialized"}
             </Badge>
             <Badge variant={bannerShown ? "default" : "secondary"}>
               {bannerShown ? "👁️ Banner Active" : "👁️‍🗨️ Banner Hidden"}
@@ -74,12 +74,12 @@ const AdMobStatus = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 <div className="space-y-2">
                   <div className="font-medium">App Configuration:</div>
-                  <div>App ID: 1160387479246621</div>
+                  <div>App ID: {status.appId}</div>
                   <div>Mode: Production</div>
                 </div>
                 <div className="space-y-2">
                   <div className="font-medium">Ad Units:</div>
-                  <div>Interstitial: 1160387479246621_1161152762503426</div>
+                  <div>Interstitial: {status.interstitialPlacementId}</div>
                 </div>
               </div>
 
@@ -87,7 +87,7 @@ const AdMobStatus = () => {
               <div className="grid grid-cols-2 gap-2">
                 <Button 
                   onClick={handleShowBanner} 
-                  disabled={!isReady || status.isInitializing}
+                  disabled={!isReady || !status.isInitialized}
                   size="sm"
                   className="flex items-center gap-2"
                 >
@@ -106,7 +106,7 @@ const AdMobStatus = () => {
                 </Button>
                 <Button 
                   onClick={handleShowInterstitial} 
-                  disabled={!isReady || status.isInitializing}
+                  disabled={!isReady || !status.isInitialized}
                   variant="secondary"
                   size="sm"
                   className="col-span-2"

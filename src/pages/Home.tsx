@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,11 +6,11 @@ import { Link } from "react-router-dom";
 import { Search, Image, TrendingUp, Zap, Play, ArrowRight, Star } from "lucide-react";
 import { getSavedContent } from "@/utils/localStorage";
 import { useState, useEffect } from "react";
-import { useFacebookAds } from "@/hooks/useFacebookAds";
+import { useMetaAudienceNetwork } from "@/hooks/useMetaAudienceNetwork";
 
 const Home = () => {
   const [savedCount, setSavedCount] = useState(0);
-  const { isReady, bannerShown, error, showBanner, showInterstitial, status } = useFacebookAds();
+  const { isReady, bannerShown, error, showBanner, showInterstitial, status } = useMetaAudienceNetwork();
 
   useEffect(() => {
     setSavedCount(getSavedContent().length);
@@ -58,11 +59,11 @@ const Home = () => {
 
   return (
     <div className="space-y-8 pb-20 md:pb-8">
-      {/* Facebook Ads Status Display */}
+      {/* Meta Audience Network Status Display */}
       {status.isNativePlatform && (
         <div className="bg-green-100 p-4 rounded-lg">
           <div className="text-sm space-y-1">
-            <div>🎯 Facebook Ads Status: {isReady ? '✅ Ready' : '❌ Not Ready'}</div>
+            <div>🎯 Meta Audience Network Status: {isReady ? '✅ Ready' : '❌ Not Ready'}</div>
             <div>📱 Platform: {status.isNativePlatform ? 'Native' : 'Web'}</div>
             <div>🎞️ Banner: {bannerShown ? '✅ Showing' : '❌ Hidden'}</div>
             {error && <div className="text-red-600">❌ Error: {error}</div>}
@@ -154,7 +155,7 @@ const Home = () => {
             <div className="text-2xl font-bold text-primary">
               {isReady ? '✅' : '❌'}
             </div>
-            <div className="text-sm text-muted-foreground">Facebook Ads</div>
+            <div className="text-sm text-muted-foreground">Meta Ads</div>
           </CardContent>
         </Card>
       </div>

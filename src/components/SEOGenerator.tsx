@@ -1,241 +1,230 @@
-import { useState } from "react";
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Search, Sparkles, CheckCircle } from "lucide-react";
-import { toast } from "sonner";
-import { useFacebookAds } from "@/hooks/useFacebookAds";
+import { Separator } from "@/components/ui/separator";
+import { generateSEOContent } from '../services/seoGenerationService';
+import { Copy, Wand2, Lightbulb, Hash, FileText, Eye } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { useMetaAudienceNetwork } from "@/hooks/useMetaAudienceNetwork";
+
+interface SEOResult {
+  title: string;
+  description: string;
+  tags: string[];
+  hashtags: string[];
+}
 
 const SEOGenerator = () => {
-  const [keyword, setKeyword] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedData, setGeneratedData] = useState<{
-    tags: string[];
-    title: string;
-    description: string;
-  } | null>(null);
+  const [topic, setTopic] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<SEOResult | null>(null);
+  const { toast } = useToast();
+  const { showInterstitial, isReady, status } = useMetaAudienceNetwork();
 
-  const { isReady, showInterstitial } = useFacebookAds();
-
-  const saveToHistory = (data: { tags: string[]; title: string; description: string; keyword: string }) => {
-    try {
-      const history = JSON.parse(localStorage.getItem('seo-history') || '[]');
-      const newEntry = {
-        id: Date.now(),
-        timestamp: new Date().toISOString(),
-        ...data
-      };
-      history.unshift(newEntry);
-      const trimmedHistory = history.slice(0, 50);
-      localStorage.setItem('seo-history', JSON.stringify(trimmedHistory));
-    } catch (error) {
-      console.error('Error saving to history:', error);
-    }
-  };
-
-  const generateSEOContent = async () => {
-    if (!keyword.trim()) {
-      toast.error("Please enter a keyword or title");
+  const handleGenerate = async () => {
+    if (!topic.trim()) {
+      toast({
+        title: "Topic Required",
+        description: "Please enter a topic for your video",
+        variant: "destructive",
+      });
       return;
     }
 
-    setIsGenerating(true);
-    
-    // Simulate AI generation
-    setTimeout(async () => {
-      const sampleTags = [
-        `${keyword}`,
-        `${keyword} tutorial`,
-        `${keyword} guide`,
-        `${keyword} tips`,
-        `${keyword} 2024`,
-        "youtube growth",
-        "content creator",
-        "viral video",
-        "youtube algorithm",
-        "video marketing"
-      ];
+    setIsLoading(true);
 
-      const sampleTitle = `${keyword} - Complete Guide for 2024 | Boost Your YouTube Growth`;
-      const sampleDescription = `🚀 Master ${keyword} with this comprehensive guide! Learn proven strategies to grow your YouTube channel, increase views, and boost engagement. Perfect for content creators looking to dominate in 2024.
-
-🔥 What you'll learn:
-• Advanced ${keyword} techniques
-• YouTube algorithm secrets
-• Content optimization strategies
-• Engagement boosting tips
-
-📈 Transform your channel today! Don't forget to LIKE, SUBSCRIBE, and hit the BELL icon for more amazing content!
-
-#${keyword.replace(/\s+/g, '')} #YouTube #ContentCreator #Growth #2024`;
-
-      const generatedContent = {
-        tags: sampleTags,
-        title: sampleTitle,
-        description: sampleDescription
-      };
-
-      setGeneratedData(generatedContent);
-      
-      // Save to history
-      saveToHistory({
-        ...generatedContent,
-        keyword
-      });
-      
-      setIsGenerating(false);
-      toast.success("SEO content generated successfully!");
-      
-      // Show interstitial ad after successful generation
-      if (isReady) {
-        setTimeout(() => {
-          showInterstitial();
-        }, 1000);
+    try {
+      // Show interstitial ad if ready and on native platform
+      if (isReady && status.isNativePlatform) {
+        console.log('🎯 Showing interstitial ad before SEO generation...');
+        await showInterstitial();
       }
-    }, 2000);
+
+      const seoContent = await generateSEOContent(topic);
+      setResult(seoContent);
+      
+      toast({
+        title: "SEO Content Generated!",
+        description: "Your optimized content is ready to use",
+      });
+    } catch (error) {
+      console.error('SEO generation error:', error);
+      toast({
+        title: "Generation Failed",
+        description: "Please try again or check your connection",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const copyToClipboard = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${type} copied to clipboard!`);
+    toast({
+      title: "Copied!",
+      description: `${type} copied to clipboard`,
+    });
   };
 
   return (
-    <div id="generator" className="py-20 px-4">
-      <div className="container mx-auto max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 gradient-text">
-            SEO Content Generator
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Enter your video topic and get optimized tags, titles, and descriptions
-          </p>
-        </div>
-
-        {/* Input Section */}
-        <Card className="mb-8 glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
-              Enter Your Video Topic
-            </CardTitle>
-            <CardDescription>
-              Describe your video content or enter main keywords
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+    <div className="space-y-6">
+      <Card className="glass">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wand2 className="w-5 h-5" />
+            AI SEO Generator
+          </CardTitle>
+          <CardDescription>
+            Generate optimized titles, descriptions, and tags for your videos
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="topic">Video Topic</Label>
             <Input
-              placeholder="e.g., React Tutorial, Cooking Tips, Travel Vlog..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              className="text-lg p-6"
+              id="topic"
+              placeholder="Enter your video topic (e.g., 'How to cook pasta')"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleGenerate()}
             />
-            <Button
-              onClick={generateSEOContent}
-              disabled={isGenerating}
-              className="w-full bg-gradient-primary hover:opacity-90 text-white font-semibold py-6 text-lg"
-            >
-              {isGenerating ? (
-                <>
-                  <Sparkles className="w-5 h-5 mr-2 animate-spin" />
-                  Generating Amazing Content...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Generate SEO Content
-                </>
-              )}
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+          
+          <Button 
+            onClick={handleGenerate} 
+            disabled={isLoading || !topic.trim()}
+            className="w-full"
+          >
+            {isLoading ? (
+              <>
+                <Wand2 className="w-4 h-4 mr-2 animate-spin" />
+                Generating SEO Content...
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-4 h-4 mr-2" />
+                Generate SEO Content
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
 
-        {/* Results Section */}
-        {generatedData && (
-          <div className="space-y-6 animate-fade-in">
-            {/* Tags */}
-            <Card className="glass">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                    SEO Tags
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(generatedData.tags.join(", "), "Tags")}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
+      {result && (
+        <div className="space-y-4">
+          {/* Title */}
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Optimized Title
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-2">
+                <p className="flex-1 font-medium">{result.title}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(result.title, 'Title')}
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Description */}
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="w-4 h-4" />
+                SEO Description
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Textarea
+                  value={result.description}
+                  readOnly
+                  className="min-h-[100px] resize-none"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(result.description, 'Description')}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy Description
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Tags */}
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Hash className="w-4 h-4" />
+                SEO Tags
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
-                  {generatedData.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="text-sm py-1 px-3">
+                  {result.tags.map((tag, index) => (
+                    <Badge key={index} variant="secondary">
                       {tag}
                     </Badge>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(result.tags.join(', '), 'Tags')}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy All Tags
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Title */}
-            <Card className="glass">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                    Optimized Title
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(generatedData.title, "Title")}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
+          {/* Hashtags */}
+          <Card className="glass">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Lightbulb className="w-4 h-4" />
+                Social Hashtags
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  {result.hashtags.map((hashtag, index) => (
+                    <Badge key={index} variant="outline">
+                      {hashtag}
+                    </Badge>
+                  ))}
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-lg font-medium">{generatedData.title}</p>
-              </CardContent>
-            </Card>
-
-            {/* Description */}
-            <Card className="glass">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-success" />
-                    SEO Description
-                  </CardTitle>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(generatedData.description, "Description")}
-                  >
-                    <Copy className="w-4 h-4 mr-2" />
-                    Copy
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={generatedData.description}
-                  readOnly
-                  className="min-h-[200px] text-sm leading-relaxed"
-                />
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => copyToClipboard(result.hashtags.join(' '), 'Hashtags')}
+                >
+                  <Copy className="w-4 h-4 mr-2" />
+                  Copy All Hashtags
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

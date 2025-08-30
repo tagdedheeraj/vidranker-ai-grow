@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useFacebookAds } from '../hooks/useFacebookAds';
+import { useMetaAudienceNetwork } from '../hooks/useMetaAudienceNetwork';
 import { RefreshCw, Eye, EyeOff, Smartphone, AlertCircle, Play } from 'lucide-react';
 
-const AdMobStatus = () => {
+const MetaAudienceNetworkStatus = () => {
   const { 
     isReady, 
     bannerShown, 
@@ -15,16 +15,16 @@ const AdMobStatus = () => {
     showInterstitial, 
     hideBanner,
     status
-  } = useFacebookAds();
+  } = useMetaAudienceNetwork();
 
   const handleShowBanner = async () => {
     const success = await showBanner();
-    console.log('🎯 Facebook Banner trigger result:', success);
+    console.log('🎯 Meta Banner trigger result:', success);
   };
 
   const handleShowInterstitial = async () => {
     const success = await showInterstitial();
-    console.log('🎯 Facebook Interstitial trigger result:', success);
+    console.log('🎯 Meta Interstitial trigger result:', success);
   };
 
   const handleHideBanner = async () => {
@@ -37,7 +37,7 @@ const AdMobStatus = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <RefreshCw className="w-5 h-5" />
-            Facebook Ads Status & Controls
+            Meta Audience Network Status & Controls
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -47,7 +47,7 @@ const AdMobStatus = () => {
               {status.isNativePlatform ? "📱 Native App" : "🌐 Web Browser"}
             </Badge>
             <Badge variant={isReady ? "default" : "destructive"}>
-              {isReady ? "✅ Facebook Ads Ready" : "❌ Not Ready"}
+              {isReady ? "✅ Meta Audience Network Ready" : "❌ Not Ready"}
             </Badge>
             <Badge variant={status.isInitialized ? "default" : "secondary"}>
               {status.isInitialized ? "✅ Initialized" : "🔄 Not Initialized"}
@@ -80,6 +80,7 @@ const AdMobStatus = () => {
                 <div className="space-y-2">
                   <div className="font-medium">Ad Units:</div>
                   <div>Interstitial: {status.interstitialPlacementId}</div>
+                  <div>Banner: {status.bannerPlacementId}</div>
                 </div>
               </div>
 
@@ -132,14 +133,15 @@ const AdMobStatus = () => {
               <Smartphone className="h-4 w-4" />
               <AlertDescription>
                 <div className="space-y-2">
-                  <div className="font-medium">Facebook Ads requires Native Mobile App</div>
+                  <div className="font-medium">Meta Audience Network requires Native Mobile App</div>
                   <div className="text-sm">
                     To see ads, you need to:
                   </div>
                   <ol className="text-sm list-decimal list-inside space-y-1">
                     <li>Export project to GitHub</li>
                     <li>Run: <code className="bg-muted px-1 rounded">npx cap add android</code></li>
-                    <li>Configure AndroidManifest.xml</li>
+                    <li>Configure AndroidManifest.xml with Meta App ID</li>
+                    <li>Add Audience Network SDK to build.gradle</li>
                     <li>Build and run on Android device</li>
                   </ol>
                 </div>
@@ -152,4 +154,4 @@ const AdMobStatus = () => {
   );
 };
 
-export default AdMobStatus;
+export default MetaAudienceNetworkStatus;

@@ -1,11 +1,6 @@
 
 import { Capacitor } from '@capacitor/core';
-
-declare global {
-  interface Window {
-    MetaAudienceNetwork: any;
-  }
-}
+import { MetaAudienceNetwork } from './metaAudienceNetworkPlugin';
 
 class MetaAudienceNetworkService {
   private isInitialized = false;
@@ -31,25 +26,25 @@ class MetaAudienceNetworkService {
       console.log('🚀 Meta Audience Network: Starting initialization...');
       console.log('📱 App ID:', this.APP_ID);
       
-      if (window.MetaAudienceNetwork) {
-        await window.MetaAudienceNetwork.initialize({
-          appId: this.APP_ID,
-          testMode: false
-        });
+      const result = await MetaAudienceNetwork.initialize({
+        appId: this.APP_ID,
+        testMode: false
+      });
 
-        this.isInitialized = true;
+      this.isInitialized = result.success;
+      
+      if (this.isInitialized) {
         console.log('✅ Meta Audience Network: Initialization successful!');
         
         // Auto-load banner after 2 seconds
         setTimeout(() => {
           this.showBanner();
         }, 2000);
-        
-        return true;
       } else {
-        console.error('❌ Meta Audience Network plugin not found');
-        return false;
+        console.error('❌ Meta Audience Network initialization failed');
       }
+      
+      return this.isInitialized;
     } catch (error) {
       console.error('❌ Meta Audience Network initialization failed:', error);
       return false;
@@ -70,18 +65,20 @@ class MetaAudienceNetworkService {
     try {
       console.log('🎯 Meta Audience Network: Loading banner ad...');
       
-      if (window.MetaAudienceNetwork) {
-        await window.MetaAudienceNetwork.showBanner({
-          placementId: this.BANNER_PLACEMENT_ID,
-          position: 'bottom'
-        });
+      const result = await MetaAudienceNetwork.showBanner({
+        placementId: this.BANNER_PLACEMENT_ID,
+        position: 'bottom'
+      });
 
-        this.bannerShown = true;
+      this.bannerShown = result.success;
+      
+      if (this.bannerShown) {
         console.log('✅ Meta Audience Network: Banner displayed!');
-        return true;
+      } else {
+        console.error('❌ Meta Audience Network: Banner failed to load');
       }
       
-      return false;
+      return this.bannerShown;
     } catch (error) {
       console.error('❌ Meta Audience Network: Banner failed:', error);
       return false;
@@ -97,21 +94,28 @@ class MetaAudienceNetworkService {
     try {
       console.log('🎯 Meta Audience Network: Loading interstitial ad...');
       
-      if (window.MetaAudienceNetwork) {
-        // Load and immediately show interstitial
-        await window.MetaAudienceNetwork.loadInterstitial({
-          placementId: this.INTERSTITIAL_PLACEMENT_ID
-        });
+      // Load interstitial
+      const loadResult = await MetaAudienceNetwork.loadInterstitial({
+        placementId: this.INTERSTITIAL_PLACEMENT_ID
+      });
 
-        await window.MetaAudienceNetwork.showInterstitial({
+      if (loadResult.success) {
+        // Show interstitial immediately after loading
+        const showResult = await MetaAudienceNetwork.showInterstitial({
           placementId: this.INTERSTITIAL_PLACEMENT_ID
         });
         
-        console.log('✅ Meta Audience Network: Interstitial displayed!');
-        return true;
+        if (showResult.success) {
+          console.log('✅ Meta Audience Network: Interstitial displayed!');
+          return true;
+        } else {
+          console.error('❌ Meta Audience Network: Interstitial show failed');
+          return false;
+        }
+      } else {
+        console.error('❌ Meta Audience Network: Interstitial load failed');
+        return false;
       }
-      
-      return false;
     } catch (error) {
       console.error('❌ Meta Audience Network: Interstitial failed:', error);
       return false;
@@ -121,11 +125,9 @@ class MetaAudienceNetworkService {
   async hideBanner(): Promise<void> {
     if (this.bannerShown && Capacitor.isNativePlatform()) {
       try {
-        if (window.MetaAudienceNetwork) {
-          await window.MetaAudienceNetwork.hideBanner();
-          this.bannerShown = false;
-          console.log('✅ Meta Audience Network: Banner hidden');
-        }
+        await MetaAudienceNetwork.hideBanner();
+        this.bannerShown = false;
+        console.log('✅ Meta Audience Network: Banner hidden');
       } catch (error) {
         console.error('❌ Meta Audience Network: Hide banner failed:', error);
       }

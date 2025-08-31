@@ -19,8 +19,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import AppAdsText from "./components/AppAdsText";
-import FacebookBanner from "./components/FacebookBanner";
-import { facebookAdsService } from "./services/facebookAdsService";
+import { metaAudienceNetworkService } from "./services/metaAudienceNetworkService";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,7 +50,7 @@ const App = () => {
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log("🚀 VidRanker Starting - Facebook Ads Mode");
+        console.log("🚀 VidRanker Starting - Meta Audience Network Mode");
         console.log("📱 Platform:", Capacitor.getPlatform());
         console.log("🔧 Native Platform:", Capacitor.isNativePlatform());
         
@@ -66,23 +65,23 @@ const App = () => {
             }
           }, 2000);
 
-          // Initialize Facebook Ads
+          // Initialize Meta Audience Network
           setTimeout(async () => {
             try {
-              console.log("🎯 Starting Facebook Ads initialization...");
-              const success = await facebookAdsService.initialize();
+              console.log("🎯 Starting Meta Audience Network initialization...");
+              const success = await metaAudienceNetworkService.initialize();
               
               if (success) {
-                console.log("✅ Facebook Ads ready!");
+                console.log("✅ Meta Audience Network ready!");
               } else {
-                console.log("❌ Facebook Ads initialization failed");
+                console.log("❌ Meta Audience Network initialization failed");
               }
             } catch (error) {
-              console.error("💥 Facebook Ads error:", error);
+              console.error("💥 Meta Audience Network error:", error);
             }
           }, 1500);
         } else {
-          console.log("🌐 Web platform - Facebook Ads will be initialized when app runs on mobile");
+          console.log("🌐 Web platform - Meta Audience Network will be initialized when app runs on mobile");
         }
         
       } catch (error) {
@@ -119,7 +118,6 @@ const App = () => {
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </main>
-                    <FacebookBanner />
                     <BottomNavigation />
                   </>
                 } />

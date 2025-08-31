@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { generateSEOContent } from '../services/seoGenerationService';
+import { SEOGenerationService } from '../services/seoGenerationService';
 import { Copy, Wand2, Lightbulb, Hash, FileText, Eye } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useMetaAudienceNetwork } from "@/hooks/useMetaAudienceNetwork";
@@ -44,7 +45,7 @@ const SEOGenerator = () => {
         await showInterstitial();
       }
 
-      const seoContent = await generateSEOContent(topic);
+      const seoContent = await SEOGenerationService.generateSEOContent(topic);
       setResult(seoContent);
       
       toast({
